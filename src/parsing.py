@@ -3,8 +3,11 @@ from pathlib import Path
 from pydantic import BaseModel, PositiveInt, Field, ValidationError
 from typing import Any
 
+
 class Config(BaseModel):
-    highscore_filename: str = Field(pattern=r"\.json$", default="highscore.json")
+    highscore_filename: str = Field(
+        pattern=r"\.json$", default="highscore.json"
+    )
     lives: PositiveInt = Field(default=3)
     width: PositiveInt = Field(default=10)
     height: PositiveInt = Field(default=20)
@@ -15,12 +18,14 @@ class Config(BaseModel):
     seed: Any = Field(default=None)
     level_max_time: PositiveInt = Field(default=90)
 
+
 def format_config_error(e: ValidationError) -> str:
     lines: list[str] = []
     for err in e.errors():
         key = ".".join(str(part) for part in err["loc"])
         lines.append(f"Invalid config key '{key}', using default")
     return "\n".join(lines)
+
 
 class Parsing:
     def __init__(self, filepath: Path):
@@ -49,7 +54,9 @@ class Parsing:
 
         for name, field in Config.model_fields.items():
             if name not in data:
-                print(f"config: missing '{name}', using default: {field.default}")
+                print(
+                    f"config: missing '{name}', using default: {field.default}"
+                )
 
         return config
 

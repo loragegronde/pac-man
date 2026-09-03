@@ -1,6 +1,8 @@
 from src.parsing import Parsing, Config
 import argparse
 from pathlib import Path
+from mazegenerator import MazeGenerator
+from src.graphics import Graphics
 
 
 class Main:
@@ -10,6 +12,8 @@ class Main:
         self.args: argparse.Namespace = self.parser.parse_args()
         self.filepath: Path = Path(self.args.filename).absolute()
         self.config: Config = Parsing(self.filepath).parse()
+        self.graphics: Graphics = Graphics(1200, 720)
+        self.graphics.run()
 
 
 if __name__ == "__main__":
