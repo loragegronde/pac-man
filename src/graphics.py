@@ -126,16 +126,12 @@ class Graphics:
                         self.running = False
                     elif event.key in (pygame.K_RIGHT, pygame.K_d):
                         direction = "right"
-                        frame_index = 0
                     elif event.key in (pygame.K_LEFT, pygame.K_a):
                         direction = "left"
-                        frame_index = 0
                     elif event.key in (pygame.K_DOWN, pygame.K_s):
                         direction = "down"
-                        frame_index = 0
                     elif event.key in (pygame.K_UP, pygame.K_w):
                         direction = "up"
-                        frame_index = 0
 
             anim_time += dt
             if anim_time >= FRAME_DURATION:
