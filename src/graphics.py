@@ -107,6 +107,8 @@ class Graphics:
             "up": [pac_man_u1, pac_man_u2, pac_man_u3],
         }
 
+        pac_man_spawn: list[pygame.Surface] = [crop(img, 351, 4 + (i * 50), 35, 35) for i in range(11)][::-1]
+
         direction = "right"
         FRAME_DURATION = 0.15
         anim_time = 0.0
@@ -161,6 +163,8 @@ class Graphics:
             _ = self.screen.blit(
                 pac_frames[frame_index % len(pac_frames)], (200, 1)
             )
-
+            _ = self.screen.blit(
+                pac_man_spawn[frame_index % len(pac_man_spawn)], (250, 1)
+            )
             pygame.display.flip()
         pygame.quit()
