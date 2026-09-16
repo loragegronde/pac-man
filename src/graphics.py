@@ -107,8 +107,20 @@ class Graphics:
             "up": [pac_man_u1, pac_man_u2, pac_man_u3],
         }
 
-        pac_man_spawn: list[pygame.Surface] = [crop(img, 351, 4 + (i * 50), 35, 35) for i in range(11)][::-1]
+        pac_man_spawn: list[pygame.Surface] = [crop(img, 351, 4 + (i * 50), 35, 35) for i in range(11)]
 
+        play = pygame.image.load("assets/play.png").convert_alpha()
+        play_hovered = pygame.image.load("assets/play_hovered.png").convert_alpha()
+        title = crop(pygame.image.load("assets/title.png").convert_alpha(), 0, 0, 850, 194)
+
+        play_w, play_h = 174, 45
+        play_x = 1200 // 2 - play_w // 2
+        play_y = 720 // 2 - play_h // 2
+
+        title_w, title_h = 850, 194
+        title_x = 1200 // 2 - title_w // 2
+        title_y = 720 // 2 - title_h // 2
+        
         direction = "right"
         FRAME_DURATION = 0.15
         anim_time = 0.0
@@ -141,6 +153,20 @@ class Graphics:
                 frame_index += 1
 
             _ = self.screen.fill((0, 0, 0))
+
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+
+            hovered = (
+                play_x <= mouse_x < play_x + play_w
+                and play_y <= mouse_y < play_y + play_h
+            )
+            
+            if hovered:
+                _ = self.screen.blit(play_hovered, (play_x, play_y))
+            else:
+                _ = self.screen.blit(play, (play_x, play_y))
+
+            _ = self.screen.blit(title, (title_x, title_y - 180))
 
             blinky_frames = blinky[direction]
             pinky_frames = pinky[direction]
