@@ -5,192 +5,130 @@ import pygame
 import time
 
 
+def crop(sheet: pygame.Surface, x: int, y: int, w: int, h: int) -> pygame.Surface:
+    out = pygame.Surface((w, h), pygame.SRCALPHA)
+    _ = out.blit(sheet, (0, 0), (x, y, w, h))
+    return out
+
+
+def make_background(width: int, height: int) -> pygame.Surface:
+    bg = pygame.Surface((width, height))
+    for y in range(height):
+        t = y / max(height - 1, 1)
+        r = int(4 + 10 * t)
+        g = int(4 + 8 * t)
+        b = int(18 + 28 * t)
+        _ = bg.fill((r, g, b), pygame.Rect(0, y, width, 1))
+
+    star = (220, 220, 255)
+    dim = (80, 90, 140)
+    stars = [
+        (40, 50), (120, 90), (200, 30), (280, 70), (360, 40),
+        (440, 100), (520, 55), (600, 25), (680, 80), (760, 45),
+        (840, 95), (920, 35), (1000, 75), (1080, 50), (1150, 90),
+        (80, 180), (180, 220), (300, 160), (420, 200), (540, 150),
+        (660, 190), (780, 170), (900, 210), (1020, 165), (1120, 195),
+        (60, 400), (160, 450), (260, 420), (380, 480), (500, 430),
+        (620, 470), (740, 440), (860, 490), (980, 455), (1100, 475),
+        (100, 560), (250, 600), (400, 580), (550, 620), (700, 590),
+        (850, 630), (1000, 610), (1140, 650),
+    ]
+    for i, (sx, sy) in enumerate(stars):
+        if 0 <= sx < width and 0 <= sy < height:
+            bg.set_at((sx, sy), star if i % 3 == 0 else dim)
+            if i % 5 == 0 and sx + 1 < width:
+                bg.set_at((sx + 1, sy), dim)
+    return bg
+
+
 class Graphics:
     def __init__(self, width: int, height: int):
         _ = pygame.init()
         pygame.display.set_caption("pac-man")
+        self.width: int = width
+        self.height: int = height
         self.screen: pygame.Surface = pygame.display.set_mode((width, height))
         self.running: bool = False
+        self.state: str = "menu"
 
     def run(self) -> None:
-        last = time.monotonic()
-        img = pygame.image.load("assets/sprites.png").convert_alpha()
+        background = make_background(self.width, self.height)
 
-        def crop(
-            sheet: pygame.Surface, x: int, y: int, w: int, h: int
-        ) -> pygame.Surface:
-            img = pygame.Surface((w, h), pygame.SRCALPHA)
-            _ = img.blit(sheet, (0, 0), (x, y, w, h))
-            return img
-
-        blinky_r1: pygame.Surface = crop(img, 651, 4, 35, 35)
-        blinky_r2: pygame.Surface = crop(img, 651, 54, 35, 35)
-        blinky_d1: pygame.Surface = crop(img, 651, 104, 35, 35)
-        blinky_d2: pygame.Surface = crop(img, 651, 154, 35, 35)
-        blinky_l1: pygame.Surface = crop(img, 651, 204, 35, 35)
-        blinky_l2: pygame.Surface = crop(img, 651, 254, 35, 35)
-        blinky_u1: pygame.Surface = crop(img, 651, 304, 35, 35)
-        blinky_u2: pygame.Surface = crop(img, 651, 354, 35, 35)
-
-        blinky = {
-            "right": [blinky_r1, blinky_r2],
-            "down": [blinky_d1, blinky_d2],
-            "left": [blinky_l1, blinky_l2],
-            "up": [blinky_u1, blinky_u2],
-        }
-
-        pinky_r1: pygame.Surface = crop(img, 701, 4, 35, 35)
-        pinky_r2: pygame.Surface = crop(img, 701, 54, 35, 35)
-        pinky_d1: pygame.Surface = crop(img, 701, 104, 35, 35)
-        pinky_d2: pygame.Surface = crop(img, 701, 154, 35, 35)
-        pinky_l1: pygame.Surface = crop(img, 701, 204, 35, 35)
-        pinky_l2: pygame.Surface = crop(img, 701, 254, 35, 35)
-        pinky_u1: pygame.Surface = crop(img, 701, 304, 35, 35)
-        pinky_u2: pygame.Surface = crop(img, 701, 354, 35, 35)
-
-        pinky = {
-            "right": [pinky_r1, pinky_r2],
-            "down": [pinky_d1, pinky_d2],
-            "left": [pinky_l1, pinky_l2],
-            "up": [pinky_u1, pinky_u2],
-        }
-
-        inky_r1: pygame.Surface = crop(img, 751, 4, 35, 35)
-        inky_r2: pygame.Surface = crop(img, 751, 54, 35, 35)
-        inky_d1: pygame.Surface = crop(img, 751, 104, 35, 35)
-        inky_d2: pygame.Surface = crop(img, 751, 154, 35, 35)
-        inky_l1: pygame.Surface = crop(img, 751, 204, 35, 35)
-        inky_l2: pygame.Surface = crop(img, 751, 254, 35, 35)
-        inky_u1: pygame.Surface = crop(img, 751, 304, 35, 35)
-        inky_u2: pygame.Surface = crop(img, 751, 354, 35, 35)
-
-        inky = {
-            "right": [inky_r1, inky_r2],
-            "down": [inky_d1, inky_d2],
-            "left": [inky_l1, inky_l2],
-            "up": [inky_u1, inky_u2],
-        }
-
-        clyde_r1: pygame.Surface = crop(img, 801, 4, 35, 35)
-        clyde_r2: pygame.Surface = crop(img, 801, 54, 35, 35)
-        clyde_d1: pygame.Surface = crop(img, 801, 104, 35, 35)
-        clyde_d2: pygame.Surface = crop(img, 801, 154, 35, 35)
-        clyde_l1: pygame.Surface = crop(img, 801, 204, 35, 35)
-        clyde_l2: pygame.Surface = crop(img, 801, 254, 35, 35)
-        clyde_u1: pygame.Surface = crop(img, 801, 304, 35, 35)
-        clyde_u2: pygame.Surface = crop(img, 801, 354, 35, 35)
-
-        clyde = {
-            "right": [clyde_r1, clyde_r2],
-            "down": [clyde_d1, clyde_d2],
-            "left": [clyde_l1, clyde_l2],
-            "up": [clyde_u1, clyde_u2],
-        }
-
-        pac_man_r1: pygame.Surface = crop(img, 851, 4, 35, 35)
-        pac_man_r2: pygame.Surface = crop(img, 851, 54, 35, 35)
-        pac_man_r3: pygame.Surface = crop(img, 851, 104, 35, 35)
-        pac_man_d1: pygame.Surface = crop(img, 851, 154, 35, 35)
-        pac_man_d2: pygame.Surface = crop(img, 851, 204, 35, 35)
-        pac_man_d3: pygame.Surface = crop(img, 851, 254, 35, 35)
-        pac_man_l1: pygame.Surface = crop(img, 851, 304, 35, 35)
-        pac_man_l2: pygame.Surface = crop(img, 851, 354, 35, 35)
-        pac_man_l3: pygame.Surface = crop(img, 851, 404, 35, 35)
-        pac_man_u1: pygame.Surface = crop(img, 851, 454, 35, 35)
-        pac_man_u2: pygame.Surface = crop(img, 851, 504, 35, 35)
-        pac_man_u3: pygame.Surface = crop(img, 851, 554, 35, 35)
-
-        pac = {
-            "right": [pac_man_r1, pac_man_r2, pac_man_r3],
-            "down": [pac_man_d1, pac_man_d2, pac_man_d3],
-            "left": [pac_man_l1, pac_man_l2, pac_man_l3],
-            "up": [pac_man_u1, pac_man_u2, pac_man_u3],
-        }
-
-        pac_man_spawn: list[pygame.Surface] = [crop(img, 351, 4 + (i * 50), 35, 35) for i in range(11)]
+        title_full = pygame.image.load("assets/title.png").convert_alpha()
+        title = crop(title_full, 0, 0, 852, 190)
+        title_w, title_h = 852, 190
 
         play = pygame.image.load("assets/play.png").convert_alpha()
         play_hovered = pygame.image.load("assets/play_hovered.png").convert_alpha()
-        title = crop(pygame.image.load("assets/title.png").convert_alpha(), 0, 0, 850, 194)
+        play_w, play_h = 180, 63
 
-        play_w, play_h = 174, 45
-        play_x = 1200 // 2 - play_w // 2
-        play_y = 720 // 2 - play_h // 2
+        hint = pygame.font.Font(None, 28).render(
+            "ENTER / CLICK PLAY", True, (200, 200, 210)
+        )
+        hint_w, hint_h = hint.get_size()
 
-        title_w, title_h = 850, 194
-        title_x = 1200 // 2 - title_w // 2
-        title_y = 720 // 2 - title_h // 2
-        
-        direction = "right"
-        FRAME_DURATION = 0.15
-        anim_time = 0.0
-        frame_index = 0
+        gap = 28
+        block_h = title_h + gap + play_h + gap + hint_h
+        block_y = (self.height - block_h) // 2
+
+        title_x = self.width // 2 - title_w // 2
+        title_y = block_y
+        play_x = self.width // 2 - play_w // 2
+        play_y = title_y + title_h + gap
+        hint_x = self.width // 2 - hint_w // 2
+        hint_y = play_y + play_h + gap
+
+        playing_msg = pygame.font.Font(None, 48).render(
+            "GAME START - ESC for menu", True, (255, 255, 0)
+        )
+        pm_w, pm_h = playing_msg.get_size()
+        playing_msg_x = self.width // 2 - pm_w // 2
+        playing_msg_y = self.height // 2 - pm_h // 2
 
         self.running = True
         while self.running:
             now = time.monotonic()
-            dt = now - last
-            last = now
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
-                if event.type == pygame.KEYDOWN:
+                elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        self.running = False
-                    elif event.key in (pygame.K_RIGHT, pygame.K_d):
-                        direction = "right"
-                    elif event.key in (pygame.K_LEFT, pygame.K_a):
-                        direction = "left"
-                    elif event.key in (pygame.K_DOWN, pygame.K_s):
-                        direction = "down"
-                    elif event.key in (pygame.K_UP, pygame.K_w):
-                        direction = "up"
+                        if self.state == "playing":
+                            self.state = "menu"
+                        else:
+                            self.running = False
+                    elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                        if self.state == "menu":
+                            self.state = "playing"
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    if self.state == "menu":
+                        mx, my = event.pos
+                        if (
+                            play_x <= mx < play_x + play_w
+                            and play_y <= my < play_y + play_h
+                        ):
+                            self.state = "playing"
 
-            anim_time += dt
-            if anim_time >= FRAME_DURATION:
-                anim_time -= FRAME_DURATION
-                frame_index += 1
+            _ = self.screen.blit(background, (0, 0))
 
-            _ = self.screen.fill((0, 0, 0))
+            if self.state == "menu":
+                _ = self.screen.blit(title, (title_x, title_y))
 
-            mouse_x, mouse_y = pygame.mouse.get_pos()
+                mx, my = pygame.mouse.get_pos()
+                hovered = (
+                    play_x <= mx < play_x + play_w
+                    and play_y <= my < play_y + play_h
+                )
+                _ = self.screen.blit(
+                    play_hovered if hovered else play, (play_x, play_y)
+                )
 
-            hovered = (
-                play_x <= mouse_x < play_x + play_w
-                and play_y <= mouse_y < play_y + play_h
-            )
-            
-            if hovered:
-                _ = self.screen.blit(play_hovered, (play_x, play_y))
+                if int(now * 2) % 2 == 0:
+                    _ = self.screen.blit(hint, (hint_x, hint_y))
             else:
-                _ = self.screen.blit(play, (play_x, play_y))
+                _ = self.screen.blit(playing_msg, (playing_msg_x, playing_msg_y))
 
-            _ = self.screen.blit(title, (title_x, title_y - 180))
-
-            blinky_frames = blinky[direction]
-            pinky_frames = pinky[direction]
-            inky_frames = inky[direction]
-            clyde_frames = clyde[direction]
-            pac_frames = pac[direction]
-
-            _ = self.screen.blit(
-                blinky_frames[frame_index % len(blinky_frames)], (1, 1)
-            )
-            _ = self.screen.blit(
-                pinky_frames[frame_index % len(pinky_frames)], (50, 1)
-            )
-            _ = self.screen.blit(
-                inky_frames[frame_index % len(inky_frames)], (100, 1)
-            )
-            _ = self.screen.blit(
-                clyde_frames[frame_index % len(clyde_frames)], (150, 1)
-            )
-            _ = self.screen.blit(
-                pac_frames[frame_index % len(pac_frames)], (200, 1)
-            )
-            _ = self.screen.blit(
-                pac_man_spawn[frame_index % len(pac_man_spawn)], (250, 1)
-            )
             pygame.display.flip()
+
         pygame.quit()
