@@ -2,6 +2,10 @@ from unpacked_mazegenerator.mazegenerator import MazeGenerator
 import pygame
 
 
+class Player():
+    def __init__(self) -> None:
+        
+
 def create_maze(maze: list[list[int]], img: pygame.Surface):
     for j in range(len(maze)):
         for i in range(len(maze[j])):
