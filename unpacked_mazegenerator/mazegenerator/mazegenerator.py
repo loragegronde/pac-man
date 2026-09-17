@@ -192,7 +192,7 @@ class MazeGenerator:
                 stack.pop()
 
     def _find_short_path(self) -> None:
-        # BFS: shortest entry->exit path in O(cells). Robust on looped (braided)
+        # BFS: shortest entry->exit path in O(cells).Robust on looped (braided)
         # mazes, where the previous depth-first search exploded exponentially.
         moves = [
             (0, -1, 1, "N"),
