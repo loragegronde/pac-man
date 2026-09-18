@@ -3,12 +3,31 @@ import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 import pygame
 import time
+import random
 
 
-def crop(sheet: pygame.Surface, x: int, y: int, w: int, h: int) -> pygame.Surface:
-    out = pygame.Surface((w, h), pygame.SRCALPHA)
-    _ = out.blit(sheet, (0, 0), (x, y, w, h))
-    return out
+def crop(
+    sheet: pygame.Surface, x: int, y: int, w: int, h: int
+) -> pygame.Surface:
+    image = pygame.Surface((w, h), pygame.SRCALPHA)
+    _ = image.blit(sheet, (0, 0), (x, y, w, h))
+    return image
+
+
+def get_star_list(width: int, height: int) -> list[tuple[int, int]]:
+
+    stars: list[tuple[int, int]] = []
+    spacing = 100
+    row = width // spacing
+    col = height // spacing
+
+    for i in range(row):
+        for j in range(col):
+            x = (i * spacing) + random.randint(0, spacing - 1)
+            y = (j * spacing) + random.randint(0, spacing - 1)
+            stars.append((x, y))
+
+    return stars
 
 
 def make_background(width: int, height: int) -> pygame.Surface:
@@ -22,17 +41,7 @@ def make_background(width: int, height: int) -> pygame.Surface:
 
     star = (220, 220, 255)
     dim = (80, 90, 140)
-    stars = [
-        (40, 50), (120, 90), (200, 30), (280, 70), (360, 40),
-        (440, 100), (520, 55), (600, 25), (680, 80), (760, 45),
-        (840, 95), (920, 35), (1000, 75), (1080, 50), (1150, 90),
-        (80, 180), (180, 220), (300, 160), (420, 200), (540, 150),
-        (660, 190), (780, 170), (900, 210), (1020, 165), (1120, 195),
-        (60, 400), (160, 450), (260, 420), (380, 480), (500, 430),
-        (620, 470), (740, 440), (860, 490), (980, 455), (1100, 475),
-        (100, 560), (250, 600), (400, 580), (550, 620), (700, 590),
-        (850, 630), (1000, 610), (1140, 650),
-    ]
+    stars = get_star_list(width, height)
     for i, (sx, sy) in enumerate(stars):
         if 0 <= sx < width and 0 <= sy < height:
             bg.set_at((sx, sy), star if i % 3 == 0 else dim)
@@ -55,11 +64,13 @@ class Graphics:
         background = make_background(self.width, self.height)
 
         title_full = pygame.image.load("assets/title.png").convert_alpha()
-        title = crop(title_full, 0, 0, 852, 190)
+        title = crop(title_full, 0, 0, 852, 195)
         title_w, title_h = 852, 190
 
         play = pygame.image.load("assets/play.png").convert_alpha()
-        play_hovered = pygame.image.load("assets/play_hovered.png").convert_alpha()
+        play_hovered = pygame.image.load(
+            "assets/play_hovered.png"
+        ).convert_alpha()
         play_w, play_h = 180, 63
 
         hint = pygame.font.Font(None, 28).render(
@@ -69,10 +80,9 @@ class Graphics:
 
         gap = 28
         block_h = title_h + gap + play_h + gap + hint_h
-        block_y = (self.height - block_h) // 2
 
         title_x = self.width // 2 - title_w // 2
-        title_y = block_y
+        title_y = (self.height - block_h) // 2
         play_x = self.width // 2 - play_w // 2
         play_y = title_y + title_h + gap
         hint_x = self.width // 2 - hint_w // 2
@@ -101,7 +111,9 @@ class Graphics:
                     elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
                         if self.state == "menu":
                             self.state = "playing"
-                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                elif (
+                    event.type == pygame.MOUSEBUTTONDOWN and event.button == 1
+                ):
                     if self.state == "menu":
                         mx, my = event.pos
                         if (
@@ -127,7 +139,9 @@ class Graphics:
                 if int(now * 2) % 2 == 0:
                     _ = self.screen.blit(hint, (hint_x, hint_y))
             else:
-                _ = self.screen.blit(playing_msg, (playing_msg_x, playing_msg_y))
+                _ = self.screen.blit(
+                    playing_msg, (playing_msg_x, playing_msg_y)
+                )
 
             pygame.display.flip()
 
