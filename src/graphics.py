@@ -107,7 +107,9 @@ class Graphics:
             "up": [pac_man_u1, pac_man_u2, pac_man_u3],
         }
 
-        pac_man_spawn: list[pygame.Surface] = [crop(img, 351, 4 + (i * 50), 35, 35) for i in range(11)][::-1]
+        pac_man_spawn: list[pygame.Surface] = [
+            crop(img, 351, 4 + (i * 50), 35, 35) for i in range(11)
+        ]
 
         direction = "right"
         FRAME_DURATION = 0.15

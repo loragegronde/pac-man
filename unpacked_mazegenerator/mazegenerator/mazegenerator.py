@@ -4,7 +4,6 @@ from typing import Iterator
 
 
 class MazeGenerator:
-
     def __init__(
         self,
         size: tuple[int, int] = (15, 15),
