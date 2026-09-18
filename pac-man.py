@@ -13,7 +13,7 @@ class Main:
         print(self.args.filename)
         self.filepath: Path = Path(self.args.filename).absolute()
         self.config: Config = Parsing(self.filepath).parse()
-        self.graphics: Graphics = Graphics(1200, 720)
+        self.graphics: Graphics = Graphics(1900, 1200)
         self.graphics.run()
 
 

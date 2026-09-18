@@ -10,7 +10,7 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False
-    title = pygame.font.Font("pacman_font.ttf", 60)
+    title = pygame.font.Font("pacman_font.ttf", 150)
     play = title.render("Play", True, (255, 255, 0))
     play_hovered = title.render("Play", True, (255, 155, 0))
     _ = screen.blit(play, (200, 200))

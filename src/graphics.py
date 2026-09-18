@@ -1,9 +1,9 @@
 import os
-
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+
 import pygame
 import time
-import random
+from random import randint
 
 
 def crop(
@@ -17,14 +17,15 @@ def crop(
 def get_star_list(width: int, height: int) -> list[tuple[int, int]]:
 
     stars: list[tuple[int, int]] = []
-    spacing = 100
+    spacing = 60
     row = width // spacing
     col = height // spacing
 
-    for i in range(row):
-        for j in range(col):
-            x = (i * spacing) + random.randint(0, spacing - 1)
-            y = (j * spacing) + random.randint(0, spacing - 1)
+    for i in range(col):
+        spacing += 7
+        for j in range(row):
+            x = (j * spacing) + randint(0, spacing - 1)
+            y = (i * spacing) + randint(0, spacing - 1)
             stars.append((x, y))
 
     return stars
@@ -38,15 +39,10 @@ def make_background(width: int, height: int) -> pygame.Surface:
         g = int(4 + 8 * t)
         b = int(18 + 28 * t)
         _ = bg.fill((r, g, b), pygame.Rect(0, y, width, 1))
-
-    star = (220, 220, 255)
-    dim = (80, 90, 140)
     stars = get_star_list(width, height)
-    for i, (sx, sy) in enumerate(stars):
-        if 0 <= sx < width and 0 <= sy < height:
-            bg.set_at((sx, sy), star if i % 3 == 0 else dim)
-            if i % 5 == 0 and sx + 1 < width:
-                bg.set_at((sx + 1, sy), dim)
+    for (sx, sy) in stars:
+        _ = pygame.draw.circle( bg, (randint(120, 220), randint(120, 220), randint(120, 220)), (sx, sy), randint(1, 4))
+            
     return bg
 
 
@@ -54,39 +50,37 @@ class Graphics:
     def __init__(self, width: int, height: int):
         _ = pygame.init()
         pygame.display.set_caption("pac-man")
+        self.screen: pygame.Surface = pygame.display.set_mode((width, height))
+        
         self.width: int = width
         self.height: int = height
-        self.screen: pygame.Surface = pygame.display.set_mode((width, height))
         self.running: bool = False
         self.state: str = "menu"
 
     def run(self) -> None:
         background = make_background(self.width, self.height)
 
-        title_full = pygame.image.load("assets/title.png").convert_alpha()
-        title = crop(title_full, 0, 0, 852, 195)
-        title_w, title_h = 852, 190
+        title = pygame.image.load("assets/title.png").convert_alpha()
+        title_w, title_h = 1500, 340
 
         play = pygame.image.load("assets/play.png").convert_alpha()
         play_hovered = pygame.image.load(
             "assets/play_hovered.png"
         ).convert_alpha()
-        play_w, play_h = 180, 63
+        play_w, play_h = 440, 123
 
-        hint = pygame.font.Font(None, 28).render(
+        hint = pygame.font.Font(None, 50).render(
             "ENTER / CLICK PLAY", True, (200, 200, 210)
         )
         hint_w, hint_h = hint.get_size()
 
-        gap = 28
-        block_h = title_h + gap + play_h + gap + hint_h
 
         title_x = self.width // 2 - title_w // 2
-        title_y = (self.height - block_h) // 2
+        title_y = self.height // 4 - title_h // 2
         play_x = self.width // 2 - play_w // 2
-        play_y = title_y + title_h + gap
+        play_y = (self.height // 2) + 100
         hint_x = self.width // 2 - hint_w // 2
-        hint_y = play_y + play_h + gap
+        hint_y = self.height // 3 + 180
 
         playing_msg = pygame.font.Font(None, 48).render(
             "GAME START - ESC for menu", True, (255, 255, 0)
