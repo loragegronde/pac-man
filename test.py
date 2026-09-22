@@ -2,6 +2,9 @@ from unpacked_mazegenerator.mazegenerator import MazeGenerator
 import pygame
 
 
+BLUE = (66, 147, 245)
+
+
 class Player:
     def __init__(self) -> None:
         pass
@@ -9,50 +12,93 @@ class Player:
 
 class Maze:
     def __init__(self) -> None:
-        pass
+        self.maze = MazeGenerator().maze
+        self.define_angles()
 
     def define_angles(self) -> None:
         self.angles: dict[str, list[tuple[int, int]]] = {
-            "up_right": [(1, -1), (2, -1), (3, -2)],
-            "up_left": [(-1, -1), (-2, -1), (-3, -2)],
-            "botom_right": [],
-            "botom_left": []
+            "top_right": [(1, 1), (2, 1), (3, 2)],
+            "top_left": [(-1, 1), (-2, 1), (-3, 2)],
+            "botom_right": [(1, -1), (2, -1), (3, -2)],
+            "botom_left": [(-1, -1), (-2, -1), (-3, -2)]
         }
 
-    def create_maze(self, maze: list[list[int]], img: pygame.Surface):
-        for j in range(len(maze)):
-            for i in range(len(maze[j])):
-                self.draw_cell(maze[j][i], (i, j), img)
+    def create_maze(self, img: pygame.Surface):
+        for j in range(len(self.maze)):
+            for i in range(len(self.maze[j])):
+                self.draw_cell(self.maze[j][i], (i, j), img)
 
     def draw_cell(self, wall: int, coordinates: tuple[int, int],
                   img: pygame.Surface):
         x, y = coordinates
-        BLUE = (66, 147, 245)
+        self.put_angles(wall, x, y, img)
         if wall & 8:
             wall -= 8
-            for i in range(50):
+            for i in range(45):
                 img.set_at((x * 50 + 5, y * 50 + i), BLUE)
         if wall & 4:
             wall -= 4
-            for i in range(50):
+            for i in range(45):
                 img.set_at((x * 50 + i, y * 50 + 44), BLUE)
         if wall & 2:
             wall -= 2
-            for i in range(50):
+            for i in range(45):
                 img.set_at((x * 50 + 44, y * 50 + i), BLUE)
         if wall & 1:
-            for i in range(50):
+            for i in range(45):
                 img.set_at((x * 50 + i, y * 50 + 5), BLUE)
+
+    def put_angles(self, wall: int, x: int, y: int,
+                   img: pygame.Surface) -> None:
+        # Botom left angle
+        if ((wall & 8 and wall & 4) or not self.maze[y][x - 1] & 4):
+            for corner_x, corner_y in self.angles["botom_left"]:
+                new_x, new_y = x * 50 + corner_x, y * 50 + 44 + corner_y
+                img.set_at((new_x, new_y), BLUE)
+        else:
+            for corner_x, corner_y in self.angles["top_right"]:
+                new_x, new_y = x * 50 + corner_x, y * 50 + 44 + corner_y
+                img.set_at((new_x, new_y), BLUE)
+
+        # Botom right angle
+        if ((wall & 4 and wall & 2) or not self.maze[y][x - 1] & 2):
+            for corner_x, corner_y in self.angles["botom_right"]:
+                new_x, new_y = x * 50 + 44 + corner_x, y * 50 + 44 + corner_y
+                img.set_at((new_x, new_y), BLUE)
+        else:
+            for corner_x, corner_y in self.angles["top_left"]:
+                new_x, new_y = x * 50 + 44 + corner_x, y * 50 + 44 + corner_y
+                img.set_at((new_x, new_y), BLUE)
+
+        # Top right angle
+        if ((wall & 2 and wall & 1) or not self.maze[y][x - 1] & 1):
+            for corner_x, corner_y in self.angles["top_right"]:
+                new_x, new_y = x * 50 + 44 + corner_x, y * 50 + corner_y
+                img.set_at((new_x, new_y), BLUE)
+        else:
+            for corner_x, corner_y in self.angles["botom_left"]:
+                new_x, new_y = x * 50 + 44 + corner_x, y * 50 + corner_y
+                img.set_at((new_x, new_y), BLUE)
+
+        # Top left angle
+        if ((wall & 1 and wall & 8) or not self.maze[y][x - 1] & 8):
+            for corner_x, corner_y in self.angles["top_left"]:
+                new_x, new_y = x * 50 + corner_x, y * 50 + corner_y
+                img.set_at((new_x, new_y), BLUE)
+        else:
+            for corner_x, corner_y in self.angles["botom_right"]:
+                new_x, new_y = x * 50 + corner_x, y * 50 + corner_y
+                img.set_at((new_x, new_y), BLUE)
 
 
 if __name__ == "__main__":
-    maze = MazeGenerator()
+    maze = Maze()
     pygame.init()
     window = pygame.display.set_mode((800, 800))
     pygame.display.set_caption("Pac-man")
     running = True
     img = pygame.Surface((750, 750))
-    create_maze(maze.maze, img)
+    maze.create_maze(img)
     window.blit(img, (25, 25))
     while running:
         for event in pygame.event.get():
