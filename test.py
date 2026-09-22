@@ -48,7 +48,7 @@ class Maze:
             for i in range(45):
                 img.set_at((x * 50 + i, y * 50 + 5), BLUE)
 
-    def put_angles(self, wall: int, x: int, y: int,
+    def draw_angles(self, wall: int, x: int, y: int,
                    img: pygame.Surface) -> None:
         # Botom left angle
         if ((wall & 8 and wall & 4) or not self.maze[y][x - 1] & 4):
@@ -58,36 +58,6 @@ class Maze:
         else:
             for corner_x, corner_y in self.angles["top_right"]:
                 new_x, new_y = x * 50 + corner_x, y * 50 + 44 + corner_y
-                img.set_at((new_x, new_y), BLUE)
-
-        # Botom right angle
-        if ((wall & 4 and wall & 2) or not self.maze[y][x - 1] & 2):
-            for corner_x, corner_y in self.angles["botom_right"]:
-                new_x, new_y = x * 50 + 44 + corner_x, y * 50 + 44 + corner_y
-                img.set_at((new_x, new_y), BLUE)
-        else:
-            for corner_x, corner_y in self.angles["top_left"]:
-                new_x, new_y = x * 50 + 44 + corner_x, y * 50 + 44 + corner_y
-                img.set_at((new_x, new_y), BLUE)
-
-        # Top right angle
-        if ((wall & 2 and wall & 1) or not self.maze[y][x - 1] & 1):
-            for corner_x, corner_y in self.angles["top_right"]:
-                new_x, new_y = x * 50 + 44 + corner_x, y * 50 + corner_y
-                img.set_at((new_x, new_y), BLUE)
-        else:
-            for corner_x, corner_y in self.angles["botom_left"]:
-                new_x, new_y = x * 50 + 44 + corner_x, y * 50 + corner_y
-                img.set_at((new_x, new_y), BLUE)
-
-        # Top left angle
-        if ((wall & 1 and wall & 8) or not self.maze[y][x - 1] & 8):
-            for corner_x, corner_y in self.angles["top_left"]:
-                new_x, new_y = x * 50 + corner_x, y * 50 + corner_y
-                img.set_at((new_x, new_y), BLUE)
-        else:
-            for corner_x, corner_y in self.angles["botom_right"]:
-                new_x, new_y = x * 50 + corner_x, y * 50 + corner_y
                 img.set_at((new_x, new_y), BLUE)
 
 
