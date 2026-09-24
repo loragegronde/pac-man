@@ -22,10 +22,10 @@ class AssetHandler:
         blinky_u2: pygame.Surface = self.crop(img, 651, 354, 35, 35)
 
         self.blinky = {
-            "right": [blinky_r1, blinky_r2],
-            "down": [blinky_d1, blinky_d2],
-            "left": [blinky_l1, blinky_l2],
-            "up": [blinky_u1, blinky_u2],
+            "E": [blinky_r1, blinky_r2],
+            "S": [blinky_d1, blinky_d2],
+            "W": [blinky_l1, blinky_l2],
+            "N": [blinky_u1, blinky_u2],
         }
 
         pinky_r1: pygame.Surface = self.crop(img, 701, 4, 35, 35)
@@ -38,10 +38,10 @@ class AssetHandler:
         pinky_u2: pygame.Surface = self.crop(img, 701, 354, 35, 35)
 
         self.pinky = {
-            "right": [pinky_r1, pinky_r2],
-            "down": [pinky_d1, pinky_d2],
-            "left": [pinky_l1, pinky_l2],
-            "up": [pinky_u1, pinky_u2],
+            "E": [pinky_r1, pinky_r2],
+            "S": [pinky_d1, pinky_d2],
+            "W": [pinky_l1, pinky_l2],
+            "N": [pinky_u1, pinky_u2],
         }
 
         inky_r1: pygame.Surface = self.crop(img, 751, 4, 35, 35)
@@ -54,10 +54,10 @@ class AssetHandler:
         inky_u2: pygame.Surface = self.crop(img, 751, 354, 35, 35)
 
         self.inky = {
-            "right": [inky_r1, inky_r2],
-            "down": [inky_d1, inky_d2],
-            "left": [inky_l1, inky_l2],
-            "up": [inky_u1, inky_u2],
+            "E": [inky_r1, inky_r2],
+            "S": [inky_d1, inky_d2],
+            "W": [inky_l1, inky_l2],
+            "N": [inky_u1, inky_u2],
         }
 
         clyde_r1: pygame.Surface = self.crop(img, 801, 4, 35, 35)
@@ -70,10 +70,10 @@ class AssetHandler:
         clyde_u2: pygame.Surface = self.crop(img, 801, 354, 35, 35)
 
         self.clyde = {
-            "right": [clyde_r1, clyde_r2],
-            "down": [clyde_d1, clyde_d2],
-            "left": [clyde_l1, clyde_l2],
-            "up": [clyde_u1, clyde_u2],
+            "E": [clyde_r1, clyde_r2],
+            "S": [clyde_d1, clyde_d2],
+            "W": [clyde_l1, clyde_l2],
+            "N": [clyde_u1, clyde_u2],
         }
 
         pac_man_r1: pygame.Surface = self.crop(img, 851, 4, 35, 35)
@@ -90,10 +90,10 @@ class AssetHandler:
         pac_man_u3: pygame.Surface = self.crop(img, 851, 554, 35, 35)
 
         self.pac = {
-            "right": [pac_man_r1, pac_man_r2, pac_man_r3],
-            "down": [pac_man_d1, pac_man_d2, pac_man_d3],
-            "left": [pac_man_l1, pac_man_l2, pac_man_l3],
-            "up": [pac_man_u1, pac_man_u2, pac_man_u3],
+            "E": [pac_man_r1, pac_man_r2, pac_man_r3],
+            "S": [pac_man_d1, pac_man_d2, pac_man_d3],
+            "W": [pac_man_l1, pac_man_l2, pac_man_l3],
+            "N": [pac_man_u1, pac_man_u2, pac_man_u3],
         }
 
         self.pac_man_spawn: list[pygame.Surface] = [
