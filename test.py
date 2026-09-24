@@ -3,6 +3,27 @@ import pygame
 
 
 BLUE = (66, 147, 245)
+ANGLES = {
+    "W": (
+        (((1, -1), (1, -2), (2, -3)), ((-1, -1), (-1, -2), (-2, -3))),
+        (((1, 1), (1, 2), (2, 3)), ((-1, 1), (-1, 2), (-2, 3)))
+    ),
+    "S": (
+        (((-1, -1), (-2, -1), (-3, -2)), ((-1, 1), (-2, 1), (-3, 2))),
+        (((1, -1), (2, -1), (3, -2)), ((1, 1), (2, 1), (3, 2)))
+    ),
+    "E": (
+        (((-1, 1), (-1, 2), (-2, 3)), ((1, 1), (1, 2), (2, 3))),
+        (((-1, -1), (-1, -2), (-2, -3)), ((1, -1), (1, -2), (2, -3)))
+    ),
+    "N": (
+        (((1, -1), (2, -1), (3, -2)), ((1, 1), (2, 1), (3, 2))),
+        (((-1, -1), (-2, -1), (-3, -2)), ((-1, 1), (-2, 1), (-3, 2)))
+    )
+}
+# format:
+# left/ right angles
+# interior/exterior
 
 
 class Player:
@@ -16,11 +37,11 @@ class Maze:
         self.define_angles()
 
     def define_angles(self) -> None:
-        self.angles: dict[str, list[tuple[int, int]]] = {
-            "top_right": [(1, 1), (2, 1), (3, 2)],
-            "top_left": [(-1, 1), (-2, 1), (-3, 2)],
-            "botom_right": [(1, -1), (2, -1), (3, -2)],
-            "botom_left": [(-1, -1), (-2, -1), (-3, -2)]
+        self.angles: dict[int, tuple] = {
+            8: (1, 4, (0, -1), (0, 1), ANGLES["W"]),
+            4: (8, 2, (0, -1), (0, 1), ANGLES["S"]),
+            2: (4, 1, (0, -1), (0, 1), ANGLES["E"]),
+            1: (2, 8, (0, -1), (0, 1), ANGLES["N"])
         }
 
     def create_maze(self, img: pygame.Surface):
@@ -31,34 +52,58 @@ class Maze:
     def draw_cell(self, wall: int, coordinates: tuple[int, int],
                   img: pygame.Surface):
         x, y = coordinates
-        self.put_angles(wall, x, y, img)
         if wall & 8:
             wall -= 8
-            for i in range(45):
-                img.set_at((x * 50 + 5, y * 50 + i), BLUE)
+            left, right, coord_l, coord_r, pixels = self.angles[8]
+            first = self.draw_angles(8, left, coord_l, pixels[0],
+                                     (x * 50 + 3, y * 50 + 3))
+            second = self.draw_angles(8, right, coord_r, pixels[1],
+                                      (x * 50 + 3, y * 50 + 47))
+            for i in range(3 - first, 48 + second):
+                img.set_at((x * 50 + 3, y * 50 + i), BLUE)
         if wall & 4:
             wall -= 4
-            for i in range(45):
-                img.set_at((x * 50 + i, y * 50 + 44), BLUE)
+            left, right, coord_l, coord_r, pixels = self.angles[4]
+            first = self.draw_angles(4, left, coord_l, pixels[0],
+                                     (x * 50 + 3, y * 50 + 47))
+            second = self.draw_angles(4, right, coord_r, pixels[1],
+                                      (x * 50 + 47, y * 50 + 47))
+            for i in range(3 - first, 48 + second):
+                img.set_at((x * 50 + i, y * 50 + 47), BLUE)
         if wall & 2:
             wall -= 2
-            for i in range(45):
-                img.set_at((x * 50 + 44, y * 50 + i), BLUE)
+            left, right, coord_l, coord_r, pixels = self.angles[2]
+            first = self.draw_angles(2, left, coord_l, pixels[0],
+                                     (x * 50 + 47, y * 50 + 47))
+            second = self.draw_angles(2, right, coord_r, pixels[1],
+                                      (x * 50 + 47, y * 50 + 3))
+            for i in range(3 - first, 48 + second):
+                img.set_at((x * 50 + 47, y * 50 + i), BLUE)
         if wall & 1:
-            for i in range(45):
-                img.set_at((x * 50 + i, y * 50 + 5), BLUE)
+            left, right, coord_l, coord_r, pixels = self.angles[1]
+            first = self.draw_angles(1, left, coord_l, pixels[0],
+                                     (x * 50 + 47, y * 50 + 3))
+            second = self.draw_angles(1, right, coord_r, pixels[1],
+                                      (x * 50 + 3, y * 50 + 3))
+            for i in range(3 - first, 48 + second):
+                img.set_at((x * 50 + i, y * 50 + 3), BLUE)
 
-    def draw_angles(self, wall: int, x: int, y: int,
-                   img: pygame.Surface) -> None:
-        # Botom left angle
-        if ((wall & 8 and wall & 4) or not self.maze[y][x - 1] & 4):
-            for corner_x, corner_y in self.angles["botom_left"]:
-                new_x, new_y = x * 50 + corner_x, y * 50 + 44 + corner_y
+    def draw_angles(self, wall: int, side: int,
+                    coord_side: tuple[int, int], pixels,
+                    coordinates: tuple[int, int]) -> int:
+        x, y = coordinates
+        side_x, side_y = x + coord_side[0], y + coord_side[1]
+        if side:
+            for corner_x, corner_y in pixels[0]:
+                new_x, new_y = x + corner_x, y + corner_y
                 img.set_at((new_x, new_y), BLUE)
+        elif self.maze[side_y][side_x] & wall:
+            return 3
         else:
-            for corner_x, corner_y in self.angles["top_right"]:
-                new_x, new_y = x * 50 + corner_x, y * 50 + 44 + corner_y
+            for corner_x, corner_y in pixels[1]:
+                new_x, new_y = x + corner_x, y + corner_y
                 img.set_at((new_x, new_y), BLUE)
+        return 0
 
 
 if __name__ == "__main__":
