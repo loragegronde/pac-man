@@ -4,17 +4,13 @@ os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
 import pygame
 import time
+from pathlib import Path
 from random import randint
 
 from src.menu import Menu
-
-
-def crop(
-    sheet: pygame.Surface, x: int, y: int, w: int, h: int
-) -> pygame.Surface:
-    image = pygame.Surface((w, h), pygame.SRCALPHA)
-    _ = image.blit(sheet, (0, 0), (x, y, w, h))
-    return image
+from src.highscores import Highscores
+from src.parsing import Config
+from src.assets import Assets
 
 
 def get_star_list(width: int, height: int) -> list[tuple[int, int]]:
@@ -55,19 +51,27 @@ def make_background(width: int, height: int) -> pygame.Surface:
 
 
 class Graphics:
-    def __init__(self, width: int, height: int):
+    def __init__(self, width: int, height: int, config: Config):
         _ = pygame.init()
         pygame.display.set_caption("pac-man")
         self.screen: pygame.Surface = pygame.display.set_mode((width, height))
 
         self.width: int = width
         self.height: int = height
+        self.config: Config = config
         self.running: bool = False
         self.state: str = "menu"
 
+        self.highscores: Highscores = Highscores(
+            Path(config.highscore_filename)
+        )
+        self.assets: Assets = Assets()
+        self.menu: Menu = Menu(
+            self.screen, width, height, self.highscores, self.assets
+        )
+
     def run(self) -> None:
         background = make_background(self.width, self.height)
-        menu = Menu(self.screen, self.width, self.height)
 
         fps = 60
         frame_time = 1.0 / fps
@@ -85,34 +89,33 @@ class Graphics:
                     self.running = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        if (
-                            self.state == "playing"
-                            or self.state == "highscore"
-                        ):
+                        if self.state in ("playing"):
                             self.state = "menu"
                         else:
                             self.running = False
                     elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
                         if self.state == "menu":
                             self.state = "playing"
-                    elif event.key is pygame.K_TAB:
-                        if self.state == "menu":
-                            self.state = "highscore"
+                    elif event.key == pygame.K_UP and self.state == "menu":
+                        self.menu.scroll_by(-1)
+                    elif event.key == pygame.K_DOWN and self.state == "menu":
+                        self.menu.scroll_by(1)
                 elif (
                     event.type == pygame.MOUSEBUTTONDOWN and event.button == 1
                 ):
                     if self.state == "menu":
-                        clicked = menu.click_at(*event.pos)
-                        if clicked is not None:
-                            self.state = clicked
+                        clicked = self.menu.click_at(*event.pos)
+                        if clicked == "playing":
+                            self.state = "playing"
+                elif event.type == pygame.MOUSEWHEEL and self.state == "menu":
+                    self.menu.scroll_by(-event.y)
 
             _ = self.screen.blit(background, (0, 0))
             if self.state == "menu":
-                menu.render(dt)
+                self.menu.render(dt)
             elif self.state == "playing":
                 pass
-            elif self.state == "highscore":
-                pass
+
             pygame.display.flip()
 
             elapsed = time.monotonic() - frame_start
