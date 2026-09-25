@@ -55,6 +55,8 @@ class Maze:
                   img: pygame.Surface):
         x, y = coordinates
         cell = wall
+        if wall == 15:
+            return
         if wall & 8:
             wall -= 8
             left, right, coord_l, coord_r, pixels = self.angles[8]
@@ -130,18 +132,38 @@ class Player():
         max_x = len(self.maze.maze[0])
         max_y = len(self.maze.maze)
         self.maze_pos = (max_x // 2, max_y // 2)
-        self.pos = (self.maze_pos[0] * 50 + 30, self.maze_pos[1] * 50 + 30)
+        self.pos = (self.maze_pos[0] * 50 + 7, self.maze_pos[1] * 50 + 7)
 
     def update_pos(self):
         x, y = self.pos
         next_x, next_y = MOVEMENT[self.direction]
-        new_pos = (x + next_x, y + next_y)
+        new_x, new_y = (x + next_x, y + next_y)
         _ = window.blit(
-                self.movement[self.direction][self.frame % 3], new_pos
+                self.movement[self.direction][self.frame % 3],
+                (new_x + 25, new_y + 25)
             )
-        self.pos = new_pos
-        print(self.pos)
+        # self.pos = (new_x, new_y)
         self.frame = self.frame + 1 % 3
+
+    def define_collisions(self):
+        pass
+
+
+class GameMode():
+    def __init__(self, maze: Maze, player: Player) -> None:
+        self.maze = maze
+        self.player = player
+
+    def refresh_frame(self):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                self.player.direction = "W"
+            if event.key == pygame.K_DOWN:
+                self.player.direction = "S"
+            if event.key == pygame.K_RIGHT:
+                self.player.direction = "E"
+            if event.key == pygame.K_UP:
+                self.player.direction = "N"
 
 
 if __name__ == "__main__":
