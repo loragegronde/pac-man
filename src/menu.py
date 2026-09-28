@@ -4,6 +4,63 @@ from src.assets import Assets, MenuLayout
 from src.highscores import Highscores, ScoreEntry
 
 
+def draw_quarter_circle_outline(
+    screen: pygame.Surface,
+    cx: int,
+    cy: int,
+    radius: int,
+    thickness: int,
+    color: tuple[int, int, int],
+    dx_sign: int,
+    dy_sign: int,
+) -> None:
+    r_outer = radius
+    r_inner = max(0, radius - thickness)
+    r_out_sq = r_outer * r_outer
+    r_in_sq = r_inner * r_inner
+    for i in range(radius + 1):
+        for j in range(radius + 1):
+            dist_sq = i * i + j * j
+            if r_in_sq < dist_sq <= r_out_sq:
+                screen.set_at((cx + dx_sign * i, cy + dy_sign * j), color)
+
+
+def draw_round_rect_outline(
+    screen: pygame.Surface,
+    x: int,
+    y: int,
+    w: int,
+    h: int,
+    color: tuple[int, int, int],
+    radius: int = 18,
+    thickness: int = 3,
+) -> None:
+    if w <= 0 or h <= 0 or thickness <= 0:
+        return
+    r = max(1, min(radius, w // 2, h // 2))
+    t = min(thickness, r)
+
+    draw_quarter_circle_outline(screen, x + r, y + r, r, t, color, -1, -1)
+    draw_quarter_circle_outline(
+        screen, x + w - 1 - r, y + r, r, t, color, 1, -1
+    )
+    draw_quarter_circle_outline(
+        screen, x + r, y + h - 1 - r, r, t, color, -1, 1
+    )
+    draw_quarter_circle_outline(
+        screen, x + w - 1 - r, y + h - 1 - r, r, t, color, 1, 1
+    )
+
+    span_w = w - 2 * r
+    span_h = h - 2 * r
+    if span_w > 0:
+        _ = pygame.draw.rect(screen, color, (x + r, y, span_w, t))
+        _ = pygame.draw.rect(screen, color, (x + r, y + h - t, span_w, t))
+    if span_h > 0:
+        _ = pygame.draw.rect(screen, color, (x, y + r, t, span_h))
+        _ = pygame.draw.rect(screen, color, (x + w - t, y + r, t, span_h))
+
+
 def draw_double_round_rect(
     screen: pygame.Surface,
     x: int,
@@ -16,20 +73,17 @@ def draw_double_round_rect(
     gap: int = 5,
     thickness: int = 3,
 ) -> None:
-    _ = pygame.draw.rect(
-        screen,
-        outer,
-        pygame.Rect(x, y, w, h),
-        width=thickness,
-        border_radius=radius,
-    )
+    draw_round_rect_outline(screen, x, y, w, h, outer, radius, thickness)
     inset = gap + thickness
-    _ = pygame.draw.rect(
+    draw_round_rect_outline(
         screen,
+        x + inset,
+        y + inset,
+        w - 2 * inset,
+        h - 2 * inset,
         inner,
-        pygame.Rect(x + inset, y + inset, w - 2 * inset, h - 2 * inset),
-        width=thickness,
-        border_radius=max(4, radius - inset),
+        max(1, radius - inset),
+        thickness,
     )
 
 

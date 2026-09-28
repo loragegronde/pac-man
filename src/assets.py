@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -15,24 +14,6 @@ def crop(
     image = pygame.Surface((w, h), pygame.SRCALPHA)
     _ = image.blit(sheet, (0, 0), (x, y, w, h))
     return image
-
-
-def scale_nearest(src: pygame.Surface, w: int, h: int) -> pygame.Surface:
-    out = pygame.Surface((w, h), pygame.SRCALPHA)
-    sw, sh = src.get_size()
-    if sw <= 0 or sh <= 0 or w <= 0 or h <= 0:
-        return out
-    src_rgba = src.convert_alpha()
-    for y in range(h):
-        sy = y * sh // h
-        for x in range(w):
-            sx = x * sw // w
-            r, g, b, a = src_rgba.get_at((sx, sy))
-            if r < 12 and g < 12 and b < 12:
-                out.set_at((x, y), (0, 0, 0, 0))
-            else:
-                out.set_at((x, y), (r, g, b, a))
-    return out
 
 
 @dataclass
@@ -58,12 +39,14 @@ class Assets:
 
     PLAY_W: int = 440
     PLAY_H: int = 123
-    
-    PANEL_W: int = 680
+
+    PANEL_W: int = 900
     VISIBLE_ROWS: int = 10
+
     ROW_H: int = 42
+
     BANNER_INSET: int = 64
-    BORDER_RADIUS: int = 22
+    BORDER_RADIUS: int = 24
     BORDER_OUTER: tuple[int, int, int] = (255, 220, 60)
     BORDER_INNER: tuple[int, int, int] = (255, 170, 50)
 
@@ -83,30 +66,21 @@ class Assets:
         self.title: pygame.Surface = self._load("title.png")
         self.play: pygame.Surface = self._load("play.png")
         self.play_hovered: pygame.Surface = self._load("play_hovered.png")
-        self.highscores_banner_raw: pygame.Surface = self._load(
-            "highscores.png"
-        )
+        self.hs_banner: pygame.Surface = self._load("highscores.png")
         self.sprites: pygame.Surface = self._load("sprites.png")
 
         banner_w = self.PANEL_W - self.BANNER_INSET
         banner_h = max(
             48,
-            self.highscores_banner_raw.get_height()
+            self.hs_banner.get_height()
             * banner_w
-            // self.highscores_banner_raw.get_width(),
-        )
-        self.hs_banner: pygame.Surface = scale_nearest(
-            self.highscores_banner_raw, banner_w, banner_h
+            // self.hs_banner.get_width(),
         )
         self.hs_banner_w: int = banner_w
         self.hs_banner_h: int = banner_h
 
-        self.up_arrow: pygame.Surface = scale_nearest(
-            self.crop_sprite(210, 663, 22, 16), self.ARROW_W, self.ARROW_H
-        )
-        self.down_arrow: pygame.Surface = scale_nearest(
-            self.crop_sprite(210, 756, 22, 16), self.ARROW_W, self.ARROW_H
-        )
+        self.up_arrow: pygame.Surface = self.crop_sprite(210, 663, 22, 16)
+        self.down_arrow: pygame.Surface = self.crop_sprite(210, 756, 22, 16)
 
         self.font_hint: pygame.font.Font = pygame.font.Font(None, 50)
         self.font: pygame.font.Font = pygame.font.Font(None, 40)
