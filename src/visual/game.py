@@ -6,15 +6,16 @@ import pygame
 
 class GameMode():
     def __init__(self, window) -> None:
+        self.maze_pos = (300, 25)
         self.window = window
         self.assets = AssetHandler()
         self.assets.get_mobs("assets/sprites.png")
         self.maze = Maze()
         self.maze.create_maze(pygame.Surface((750, 750)))
-        self.player = Player(self.maze, self.assets, window)
+        self.player = Player(self.maze, self.assets, window, self.maze_pos)
 
     def refresh_frame(self):
-        self.window.blit(self.maze.img, (25, 25))
+        self.window.blit(self.maze.img, self.maze_pos)
         self.player.update_pos()
 
     def get_direction(self, event: pygame.event.Event):

@@ -1,7 +1,6 @@
 from src.parsing import Parsing, Config
 import argparse
 from pathlib import Path
-from mazegenerator import MazeGenerator
 from src.graphics import Graphics
 
 
@@ -13,7 +12,7 @@ class Main:
         print(self.args.filename)
         self.filepath: Path = Path(self.args.filename).absolute()
         self.config: Config = Parsing(self.filepath).parse()
-        self.graphics: Graphics = Graphics(1200, 720)
+        self.graphics: Graphics = Graphics(1400, 800)
         self.graphics.run()
 
 

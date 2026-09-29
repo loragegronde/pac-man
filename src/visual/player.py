@@ -2,7 +2,8 @@ from src.visual.maze import Maze
 
 
 class Player():
-    def __init__(self, maze: Maze, assets, window) -> None:
+    def __init__(self, maze: Maze, assets, window, img_pos) -> None:
+        self.img_pos = img_pos
         self.maze = maze
         self.window = window
         self.define_start_pos()
@@ -37,9 +38,10 @@ class Player():
             next_x, next_y = 0, 0
         new_x, new_y = (x + next_x, y + next_y)
         self.pos = (new_x, new_y)
+        img_x, img_y = self.img_pos
         _ = self.window.blit(
                 self.movement[self.direction][self.frame % 3],
-                (new_x + 25, new_y + 25)
+                (new_x + img_x, new_y + img_y)
             )
         self.frame = self.frame + 1 % 3
 
