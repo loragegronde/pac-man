@@ -9,6 +9,9 @@ from src.menu import Menu
 from src.highscores import Highscores
 from src.parsing import Config
 from src.assets import Assets
+from src.victory import Victory
+from src.game_over import GameOver
+from src.name_box import NameBox
 
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
@@ -70,6 +73,14 @@ class Graphics:
             self.screen, width, height, self.highscores, self.assets
         )
         self.game: GameMode = GameMode(self.screen, self.assets)
+        self.name_box: NameBox = NameBox(self.screen, self.assets)
+        self.victory: Victory = Victory(
+            self.assets, self.screen, self.name_box
+        )
+        self.game_over: GameOver = GameOver(
+            self.assets, self.screen, self.name_box
+        )
+        self.last_score: int = 0
 
     def run(self) -> None:
         background = make_background(self.width, self.height)
@@ -89,20 +100,35 @@ class Graphics:
                 if event.type == pygame.QUIT:
                     self.running = False
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        if self.state in ("playing"):
-                            self.state = "menu"
-                        else:
-                            self.running = False
-                    elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
-                        if self.state == "menu":
+                    if self.state == "menu":
+                        if event.key == pygame.K_UP:
+                            self.menu.scroll_by(-1)
+                        elif event.key == pygame.K_DOWN:
+                            self.menu.scroll_by(1)
+                        elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
                             self.state = "playing"
-                    elif self.state == "menu" and event.key == pygame.K_UP:
-                        self.menu.scroll_by(-1)
-                    elif self.state == "menu" and event.key == pygame.K_DOWN:
-                        self.menu.scroll_by(1)
+                        elif event.key == pygame.K_ESCAPE:
+                            self.running = False
                     elif self.state == "playing":
                         self.game.get_direction(event)
+                        if event.key == pygame.K_ESCAPE:
+                            self.state = "menu"
+                        elif event.key == pygame.K_v:
+                            self.name_box.reset()
+                            self.state = "victory"
+                        elif event.key == pygame.K_o:
+                            self.name_box.reset()
+                            self.state = "game_over"
+                    elif self.state in ("victory", "game_over"):
+                        if event.key == pygame.K_ESCAPE:
+                            self.state = "menu"
+                        else:
+                            action = self.name_box.handle_keydown(event)
+                            if action == "submit":
+                                name = self.name_box.text.strip()
+                                self.highscores.add(name, self.last_score)
+                                self.menu.set_last_score(name, self.last_score)
+                                self.state = "menu"
                 elif (
                     event.type == pygame.MOUSEBUTTONDOWN and event.button == 1
                 ):
@@ -117,8 +143,11 @@ class Graphics:
             if self.state == "menu":
                 self.menu.render(dt)
             elif self.state == "playing":
-                _ = self.screen.fill((0, 0, 0))
                 self.game.refresh_frame(dt)
+            elif self.state == "victory":
+                self.victory.render(dt)
+            elif self.state == "game_over":
+                self.game_over.render(dt)
 
             pygame.display.flip()
 

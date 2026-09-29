@@ -78,6 +78,8 @@ class Assets:
         self.play_hovered: pygame.Surface = self._load("play_hovered.png")
         self.hs_banner: pygame.Surface = self._load("highscores.png")
         self.sprites: pygame.Surface = self._load("sprites.png")
+        self.victory: pygame.Surface = self._load("victory.png")
+        self.game_over: pygame.Surface = self._load("game_over.png")
 
         banner_w = self.PANEL_W - self.BANNER_INSET
         banner_h = max(
@@ -94,8 +96,8 @@ class Assets:
 
         self.font_hint: pygame.font.Font = pygame.font.Font(None, 50)
         self.font: pygame.font.Font = pygame.font.Font(None, 40)
-        self.font_small: pygame.font.Font = pygame.font.Font(None, 30)
-        self.font_large: pygame.font.Font = pygame.font.Font(None, 48)
+        self.font_medium: pygame.font.Font = pygame.font.Font(None, 50)
+        self.font_large: pygame.font.Font = pygame.font.Font(None, 80)
 
         self.hint: pygame.Surface = self.font_hint.render(
             "ENTER / CLICK PLAY", True, (200, 200, 210)
@@ -215,10 +217,10 @@ class Assets:
     def menu_layout(self, screen_w: int, screen_h: int) -> MenuLayout:
         title_x = screen_w // 2 - self.TITLE_W // 2
         title_y = screen_h // 6 - self.TITLE_H // 2
-        play_x = screen_w // 2 - self.PLAY_W
+        play_x = screen_w // 2 - self.PLAY_W - 100
         play_y = (screen_h // 2) + 100
 
-        hint_x = screen_w // 2 - self.hint_w - 24
+        hint_x = screen_w // 2 - self.hint_w - 150
         hint_y = screen_h // 3 + 180
 
         panel_w = self.PANEL_W

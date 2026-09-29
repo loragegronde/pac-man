@@ -208,16 +208,6 @@ class Menu:
         _ = self.screen.blit(a.up_arrow, lay.up_arrow.topleft)
         _ = self.screen.blit(a.down_arrow, lay.down_arrow.topleft)
 
-        if self.last_score is not None:
-            note = a.font_small.render(
-                (
-                    f"last: {str(self.last_score['name'])[:10]}  "
-                    f"{int(self.last_score['score'])}"
-                ),
-                True,
-                (255, 200, 80),
-            )
-            _ = self.screen.blit(note, (x + 36, y + h - 78))
 
     def click_at(self, mx: int, my: int) -> str | None:
         a = self.assets

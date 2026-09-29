@@ -1,5 +1,3 @@
-"""Highscore persistence: JSON list of {name, score}."""
-
 from __future__ import annotations
 
 import json
