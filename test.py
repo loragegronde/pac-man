@@ -2,31 +2,31 @@ from unpacked_mazegenerator.mazegenerator import MazeGenerator
 from src.visual.get_assets import AssetHandler
 import pygame
 
-
+OPPOSITE = {1: 4, 2: 8, 4: 1, 8: 2}
 BLUE = (66, 147, 245)
 ANGLES = {
-    "W": (
+    8: (
         (((1, -1), (1, -2), (2, -3)), ((-1, -1), (-1, -2), (-2, -3))),
         (((1, 1), (1, 2), (2, 3)), ((-1, 1), (-1, 2), (-2, 3)))
     ),
-    "S": (
+    4: (
         (((-1, -1), (-2, -1), (-3, -2)), ((-1, 1), (-2, 1), (-3, 2))),
         (((1, -1), (2, -1), (3, -2)), ((1, 1), (2, 1), (3, 2)))
     ),
-    "E": (
+    2: (
         (((-1, 1), (-1, 2), (-2, 3)), ((1, 1), (1, 2), (2, 3))),
         (((-1, -1), (-1, -2), (-2, -3)), ((1, -1), (1, -2), (2, -3)))
     ),
-    "N": (
+    1: (
         (((1, 1), (2, 1), (3, 2)), ((1, -1), (2, -1), (3, -2))),
         (((-1, 1), (-2, 1), (-3, 2)), ((-1, -1), (-2, -1), (-3, -2)))
     )
 }
 MOVEMENT = {
-    "W": (-1, 0),
-    "S": (0, 1),
-    "E": (1, 0),
-    "N": (0, -1)
+    8: (-1, 0),
+    4: (0, 1),
+    2: (1, 0),
+    1: (0, -1)
 }
 # format:
 # left/ right angles
@@ -40,10 +40,10 @@ class Maze:
 
     def define_angles(self) -> None:
         self.angles: dict[int, tuple] = {
-            8: (1, 4, (0, -1), (0, 1), ANGLES["W"]),
-            4: (8, 2, (-1, 0), (1, 0), ANGLES["S"]),
-            2: (4, 1, (0, 1), (0, -1), ANGLES["E"]),
-            1: (2, 8, (1, 0), (-1, 0), ANGLES["N"])
+            8: (1, 4, (0, -1), (0, 1), ANGLES[8]),
+            4: (8, 2, (-1, 0), (1, 0), ANGLES[4]),
+            2: (4, 1, (0, 1), (0, -1), ANGLES[2]),
+            1: (2, 8, (1, 0), (-1, 0), ANGLES[1])
         }
 
     def create_maze(self, img: pygame.Surface):
@@ -120,8 +120,8 @@ class Player():
     def __init__(self, maze: Maze, img) -> None:
         self.maze = maze
         self.define_start_pos()
-        self.direction = "E"
-        self.next_direction = "E"
+        self.direction = 2
+        self.next_direction = 2
         self.spawn = assets.pac_man_spawn
         self.movement = assets.pac
         self.frame = 0
@@ -135,18 +135,36 @@ class Player():
         self.pos = (self.maze_pos[0] * 50 + 7, self.maze_pos[1] * 50 + 7)
 
     def update_pos(self):
+        self.define_movement()
+        maze_x, maze_y = self.maze_pos
         x, y = self.pos
-        next_x, next_y = MOVEMENT[self.direction]
+        print(self.maze_pos, self.pos)
+        if (not self.maze.maze[maze_y][maze_x] & self.direction
+                or (x % 50 != 7 or y % 50 != 7)):
+            next_x, next_y = MOVEMENT[self.direction]
+        else:
+            next_x, next_y = 0, 0
         new_x, new_y = (x + next_x, y + next_y)
+        self.pos = (new_x, new_y)
         _ = window.blit(
                 self.movement[self.direction][self.frame % 3],
                 (new_x + 25, new_y + 25)
             )
-        # self.pos = (new_x, new_y)
         self.frame = self.frame + 1 % 3
 
-    def define_collisions(self):
-        pass
+    def define_movement(self):
+        x, y = self.pos
+        if x % 50 == 7 and y % 50 == 7:
+            self.maze_pos = (x // 50, y // 50)
+        if (self.direction == self.next_direction or
+                self.direction == OPPOSITE[self.next_direction]):
+            self.direction = self.next_direction
+            return
+        maze_x, maze_y = self.maze_pos
+        print(self.maze.maze[maze_y][maze_x], maze_x, maze_y)
+        if (not self.maze.maze[maze_y][maze_x] & self.next_direction
+                and x % 50 == 7 and y % 50 == 7):
+            self.direction = self.next_direction
 
 
 class GameMode():
@@ -157,13 +175,13 @@ class GameMode():
     def refresh_frame(self):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                self.player.direction = "W"
+                self.player.next_direction = 8
             if event.key == pygame.K_DOWN:
-                self.player.direction = "S"
+                self.player.next_direction = 4
             if event.key == pygame.K_RIGHT:
-                self.player.direction = "E"
+                self.player.next_direction = 2
             if event.key == pygame.K_UP:
-                self.player.direction = "N"
+                self.player.next_direction = 1
 
 
 if __name__ == "__main__":
@@ -186,13 +204,13 @@ if __name__ == "__main__":
                 if event.key == pygame.K_q:
                     running = False
                 if event.key == pygame.K_LEFT:
-                    player.direction = "W"
+                    player.next_direction = 8
                 if event.key == pygame.K_DOWN:
-                    player.direction = "S"
+                    player.next_direction = 4
                 if event.key == pygame.K_RIGHT:
-                    player.direction = "E"
+                    player.next_direction = 2
                 if event.key == pygame.K_UP:
-                    player.direction = "N"
+                    player.next_direction = 1
         _ = window.fill((0, 0, 0))
         window.blit(img, (25, 25))
         player.update_pos()
