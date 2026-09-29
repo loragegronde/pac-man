@@ -9,8 +9,6 @@ class Config(BaseModel):
         pattern=r"\.json$", default="highscore.json"
     )
     lives: PositiveInt = Field(default=3)
-    width: PositiveInt = Field(default=10)
-    height: PositiveInt = Field(default=20)
     pacgum: PositiveInt = Field(default=42)
     points_per_pacgum: PositiveInt = Field(default=10)
     points_per_super_pacgum: PositiveInt = Field(default=50)
