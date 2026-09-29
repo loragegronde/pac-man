@@ -32,6 +32,16 @@ class MenuLayout:
     down_arrow: pygame.Rect
 
 
+@dataclass
+class Mob:
+    blinky: dict[int, list[pygame.Surface]]
+    pinky: dict[int, list[pygame.Surface]]
+    clyde: dict[int, list[pygame.Surface]]
+    inky: dict[int, list[pygame.Surface]]
+    pac: dict[int, list[pygame.Surface]]
+    pac_man_spawn: list[pygame.Surface]
+
+
 class Assets:
 
     TITLE_W: int = 1500
@@ -102,6 +112,105 @@ class Assets:
 
     def crop_sprite(self, x: int, y: int, w: int, h: int) -> pygame.Surface:
         return crop(self.sprites, x, y, w, h)
+
+    def get_mobs(self) -> Mob:
+        img = self.sprites
+
+        blinky_r1: pygame.Surface = crop(img, 651, 4, 35, 35)
+        blinky_r2: pygame.Surface = crop(img, 651, 54, 35, 35)
+        blinky_d1: pygame.Surface = crop(img, 651, 104, 35, 35)
+        blinky_d2: pygame.Surface = crop(img, 651, 154, 35, 35)
+        blinky_l1: pygame.Surface = crop(img, 651, 204, 35, 35)
+        blinky_l2: pygame.Surface = crop(img, 651, 254, 35, 35)
+        blinky_u1: pygame.Surface = crop(img, 651, 304, 35, 35)
+        blinky_u2: pygame.Surface = crop(img, 651, 354, 35, 35)
+
+        blinky = {
+            2: [blinky_r1, blinky_r2],
+            4: [blinky_d1, blinky_d2],
+            8: [blinky_l1, blinky_l2],
+            1: [blinky_u1, blinky_u2],
+        }
+
+        pinky_r1: pygame.Surface = crop(img, 701, 4, 35, 35)
+        pinky_r2: pygame.Surface = crop(img, 701, 54, 35, 35)
+        pinky_d1: pygame.Surface = crop(img, 701, 104, 35, 35)
+        pinky_d2: pygame.Surface = crop(img, 701, 154, 35, 35)
+        pinky_l1: pygame.Surface = crop(img, 701, 204, 35, 35)
+        pinky_l2: pygame.Surface = crop(img, 701, 254, 35, 35)
+        pinky_u1: pygame.Surface = crop(img, 701, 304, 35, 35)
+        pinky_u2: pygame.Surface = crop(img, 701, 354, 35, 35)
+
+        pinky = {
+            2: [pinky_r1, pinky_r2],
+            4: [pinky_d1, pinky_d2],
+            8: [pinky_l1, pinky_l2],
+            1: [pinky_u1, pinky_u2],
+        }
+
+        inky_r1: pygame.Surface = crop(img, 751, 4, 35, 35)
+        inky_r2: pygame.Surface = crop(img, 751, 54, 35, 35)
+        inky_d1: pygame.Surface = crop(img, 751, 104, 35, 35)
+        inky_d2: pygame.Surface = crop(img, 751, 154, 35, 35)
+        inky_l1: pygame.Surface = crop(img, 751, 204, 35, 35)
+        inky_l2: pygame.Surface = crop(img, 751, 254, 35, 35)
+        inky_u1: pygame.Surface = crop(img, 751, 304, 35, 35)
+        inky_u2: pygame.Surface = crop(img, 751, 354, 35, 35)
+
+        inky = {
+            2: [inky_r1, inky_r2],
+            4: [inky_d1, inky_d2],
+            8: [inky_l1, inky_l2],
+            1: [inky_u1, inky_u2],
+        }
+
+        clyde_r1: pygame.Surface = crop(img, 801, 4, 35, 35)
+        clyde_r2: pygame.Surface = crop(img, 801, 54, 35, 35)
+        clyde_d1: pygame.Surface = crop(img, 801, 104, 35, 35)
+        clyde_d2: pygame.Surface = crop(img, 801, 154, 35, 35)
+        clyde_l1: pygame.Surface = crop(img, 801, 204, 35, 35)
+        clyde_l2: pygame.Surface = crop(img, 801, 254, 35, 35)
+        clyde_u1: pygame.Surface = crop(img, 801, 304, 35, 35)
+        clyde_u2: pygame.Surface = crop(img, 801, 354, 35, 35)
+
+        clyde = {
+            2: [clyde_r1, clyde_r2],
+            4: [clyde_d1, clyde_d2],
+            8: [clyde_l1, clyde_l2],
+            1: [clyde_u1, clyde_u2],
+        }
+
+        pac_man_r1: pygame.Surface = crop(img, 851, 4, 35, 35)
+        pac_man_r2: pygame.Surface = crop(img, 851, 54, 35, 35)
+        pac_man_r3: pygame.Surface = crop(img, 851, 104, 35, 35)
+        pac_man_d1: pygame.Surface = crop(img, 851, 154, 35, 35)
+        pac_man_d2: pygame.Surface = crop(img, 851, 204, 35, 35)
+        pac_man_d3: pygame.Surface = crop(img, 851, 254, 35, 35)
+        pac_man_l1: pygame.Surface = crop(img, 851, 304, 35, 35)
+        pac_man_l2: pygame.Surface = crop(img, 851, 354, 35, 35)
+        pac_man_l3: pygame.Surface = crop(img, 851, 404, 35, 35)
+        pac_man_u1: pygame.Surface = crop(img, 851, 454, 35, 35)
+        pac_man_u2: pygame.Surface = crop(img, 851, 504, 35, 35)
+        pac_man_u3: pygame.Surface = crop(img, 851, 554, 35, 35)
+
+        pac = {
+            2: [pac_man_r1, pac_man_r2, pac_man_r3],
+            4: [pac_man_d1, pac_man_d2, pac_man_d3],
+            8: [pac_man_l1, pac_man_l2, pac_man_l3],
+            1: [pac_man_u1, pac_man_u2, pac_man_u3],
+        }
+
+        pac_man_spawn: list[pygame.Surface] = [
+            crop(img, 351, 4 + (i * 50), 35, 35) for i in range(11)
+        ]
+        return Mob(
+            blinky=blinky,
+            pinky=pinky,
+            clyde=clyde,
+            inky=inky,
+            pac=pac,
+            pac_man_spawn=pac_man_spawn,
+        )
 
     def menu_layout(self, screen_w: int, screen_h: int) -> MenuLayout:
         title_x = screen_w // 2 - self.TITLE_W // 2

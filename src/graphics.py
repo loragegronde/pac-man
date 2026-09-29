@@ -1,9 +1,7 @@
 import os
-from src.visual.game import GameMode
-os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
-
 import pygame
 import time
+from src.visual.game import GameMode
 from pathlib import Path
 from random import randint
 
@@ -11,6 +9,8 @@ from src.menu import Menu
 from src.highscores import Highscores
 from src.parsing import Config
 from src.assets import Assets
+
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
 
 def get_star_list(width: int, height: int) -> list[tuple[int, int]]:
@@ -69,7 +69,7 @@ class Graphics:
         self.menu: Menu = Menu(
             self.screen, width, height, self.highscores, self.assets
         )
-        self.game: GameMode = GameMode(self.screen)
+        self.game: GameMode = GameMode(self.screen, self.assets)
 
     def run(self) -> None:
         background = make_background(self.width, self.height)
@@ -97,10 +97,12 @@ class Graphics:
                     elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
                         if self.state == "menu":
                             self.state = "playing"
-                    elif event.key == pygame.K_UP and self.state == "menu":
+                    elif self.state == "menu" and event.key == pygame.K_UP:
                         self.menu.scroll_by(-1)
-                    elif event.key == pygame.K_DOWN and self.state == "menu":
+                    elif self.state == "menu" and event.key == pygame.K_DOWN:
                         self.menu.scroll_by(1)
+                    elif self.state == "playing":
+                        self.game.get_direction(event)
                 elif (
                     event.type == pygame.MOUSEBUTTONDOWN and event.button == 1
                 ):
@@ -116,7 +118,7 @@ class Graphics:
                 self.menu.render(dt)
             elif self.state == "playing":
                 _ = self.screen.fill((0, 0, 0))
-                self.game.refresh_frame()
+                self.game.refresh_frame(dt)
 
             pygame.display.flip()
 
