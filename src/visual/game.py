@@ -12,6 +12,7 @@ class GameMode():
         self.assets.get_mobs("assets/sprites.png")
         self.maze = Maze()
         self.maze.create_maze(pygame.Surface((750, 750)))
+        self.draw_border()
         self.player = Player(self.maze, self.assets, window, self.maze_pos)
 
     def refresh_frame(self):
@@ -28,3 +29,12 @@ class GameMode():
                 self.player.next_direction = 2
             if event.key == pygame.K_UP:
                 self.player.next_direction = 1
+
+    def draw_border(self):
+        img_x, img_y = self.maze_pos
+        for x in range(756):
+            self.window.set_at((x + img_x - 3, 0 + img_y - 3), self.maze.BLUE)
+            self.window.set_at((x + img_x - 3, 755 + img_y - 3), self.maze.BLUE)
+        for y in range(756):
+            self.window.set_at((0 + img_x - 3, y + img_y - 3), self.maze.BLUE)
+            self.window.set_at((755 + img_x - 3, y + img_y - 3), self.maze.BLUE)
