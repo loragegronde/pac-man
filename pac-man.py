@@ -9,10 +9,9 @@ class Main:
         self.parser: argparse.ArgumentParser = argparse.ArgumentParser()
         _ = self.parser.add_argument("filename", type=str)
         self.args: argparse.Namespace = self.parser.parse_args()
-        print(self.args.filename)
         self.filepath: Path = Path(self.args.filename).absolute()
         self.config: Config = Parsing(self.filepath).parse()
-        self.graphics: Graphics = Graphics(1400, 800)
+        self.graphics: Graphics = Graphics(1900, 1200, self.config)
         self.graphics.run()
 
 

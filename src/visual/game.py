@@ -1,40 +1,84 @@
-from src.visual.get_assets import AssetHandler
+from src.assets import Assets
 from src.visual.maze import Maze
 from src.visual.player import Player
 import pygame
 
 
-class GameMode():
-    def __init__(self, window) -> None:
+class GameMode:
+    def __init__(self, window: pygame.Surface, assets: Assets,
+                 nb_pacgum: int = 5) -> None:
         self.maze_pos = (300, 25)
         self.window = window
-        self.assets = AssetHandler()
-        self.assets.get_mobs("assets/sprites.png")
+        self.assets = assets
         self.maze = Maze()
         self.maze.create_maze(pygame.Surface((750, 750)))
-        self.draw_border()
-        self.player = Player(self.maze, self.assets, window, self.maze_pos)
+        self.player = Player(
+            self.maze, self.assets.get_mobs(), window, self.maze_pos
+        )
+        self.nb_pacgum = nb_pacgum
+        self.define_pacgum_pos()
 
-    def refresh_frame(self):
-        self.window.blit(self.maze.img, self.maze_pos)
-        self.player.update_pos()
+    def refresh_frame(self, dt: float) -> None:
+        _ = self.window.blit(self.maze.img, self.maze_pos)
+        self.place_pacgum()
+        for i in range(3):
+            self.player.update_pos(dt)
 
-    def get_direction(self, event: pygame.event.Event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                self.player.next_direction = 8
-            if event.key == pygame.K_DOWN:
-                self.player.next_direction = 4
-            if event.key == pygame.K_RIGHT:
-                self.player.next_direction = 2
-            if event.key == pygame.K_UP:
-                self.player.next_direction = 1
+    def get_direction(self, event: pygame.event.Event) -> None:
+        if event.type != pygame.KEYDOWN:
+            return
+        if event.key == pygame.K_LEFT:
+            self.player.next_direction = 8
+        elif event.key == pygame.K_DOWN:
+            self.player.next_direction = 4
+        elif event.key == pygame.K_RIGHT:
+            self.player.next_direction = 2
+        elif event.key == pygame.K_UP:
+            self.player.next_direction = 1
 
     def draw_border(self):
         img_x, img_y = self.maze_pos
         for x in range(756):
-            self.window.set_at((x + img_x - 3, 0 + img_y - 3), self.maze.BLUE)
-            self.window.set_at((x + img_x - 3, 755 + img_y - 3), self.maze.BLUE)
+            self.window.set_at((x + img_x - 3, 0 + img_y - 3),
+                               self.maze.BLUE)
+            self.window.set_at((x + img_x - 3, 755 + img_y - 3),
+                               self.maze.BLUE)
         for y in range(756):
-            self.window.set_at((0 + img_x - 3, y + img_y - 3), self.maze.BLUE)
-            self.window.set_at((755 + img_x - 3, y + img_y - 3), self.maze.BLUE)
+            self.window.set_at((0 + img_x - 3, y + img_y - 3),
+                               self.maze.BLUE)
+            self.window.set_at((755 + img_x - 3, y + img_y - 3),
+                               self.maze.BLUE)
+
+    def define_pacgum_pos(self):
+        max_x = len(self.maze.maze[0])
+        max_y = len(self.maze.maze)
+        available = {(x, y) for y in range(max_y)
+                     for x in range(max_x)
+                     if self.maze.maze[y][x] != 15}
+        self.super_pacgum = {
+            (0, 0), (max_x - 1, 0),
+            (max_x - 1, max_y - 1),
+            (0, max_y - 1)
+        }
+        available = available.difference(self.super_pacgum)
+        self.pacgums = set()
+        i = 0
+        while i < self.nb_pacgum and available:
+            self.pacgums.add(available.pop())
+            i += 1
+
+    def place_pacgum(self):
+        maze_x, maze_y = self.maze_pos
+        for pacgum in self.pacgums:
+            x, y = pacgum
+            _ = self.window.blit(self.assets.pac_gum, (x * 50 + 22 + maze_x,
+                                                       y * 50 + 22 + maze_y))
+        for super_pacgum in self.super_pacgum:
+            x, y = super_pacgum
+            _ = self.window.blit(
+                self.assets.super_pacgum, (x * 50 + 16 + maze_x,
+                                           y * 50 + 16 + maze_y)
+            )
+
+    def check_interaction(self):
+        pass
