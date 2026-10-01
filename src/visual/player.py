@@ -15,7 +15,7 @@ class Player:
         self.movement = assets.pac
         self.frame = 0
         self.opposite = {1: 4, 2: 8, 4: 1, 8: 2}
-        self.vector = {
+        self.vector: dict[int, tuple[int, int]] = {
             8: (-1, 0),
             4: (0, 1),
             2: (1, 0),

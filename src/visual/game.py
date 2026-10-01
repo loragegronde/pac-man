@@ -6,7 +6,7 @@ import pygame
 
 class GameMode:
     def __init__(self, window: pygame.Surface, assets: Assets,
-                 nb_pacgum: int = 5) -> None:
+                 nb_pacgum: int = 500) -> None:
         self.maze_pos = (300, 25)
         self.window = window
         self.assets = assets
@@ -21,7 +21,8 @@ class GameMode:
     def refresh_frame(self, dt: float) -> None:
         _ = self.window.blit(self.maze.img, self.maze_pos)
         self.place_pacgum()
-        for i in range(3):
+        for i in range(4):
+            self.check_interaction()
             self.player.update_pos(dt)
 
     def get_direction(self, event: pygame.event.Event) -> None:
@@ -60,12 +61,15 @@ class GameMode:
             (max_x - 1, max_y - 1),
             (0, max_y - 1)
         }
-        available = available.difference(self.super_pacgum)
+        available = available.difference(
+            self.super_pacgum, {(max_x // 2, max_y // 2)}
+        )
         self.pacgums = set()
         i = 0
         while i < self.nb_pacgum and available:
             self.pacgums.add(available.pop())
             i += 1
+        self.pacgums_missing = i
 
     def place_pacgum(self):
         maze_x, maze_y = self.maze_pos
@@ -81,4 +85,23 @@ class GameMode:
             )
 
     def check_interaction(self):
-        pass
+        x, y = self.player.pos
+        direction = self.player.direction
+        check = False
+        if direction == 1 and y % 50 == 25:
+            check = True
+        if direction == 2 and (x + 35) % 50 == 25:
+            check = True
+            x += 35
+        if direction == 4 and (y + 35) % 50 == 25:
+            check = True
+            y += 35
+        if direction == 8 and x % 50 == 25:
+            check = True
+        if check:
+            maze_pos = (x // 50, y // 50)
+            if maze_pos in self.pacgums:
+                self.pacgums.remove(maze_pos)
+                self.pacgums_missing -= 1
+            if maze_pos in self.super_pacgum:
+                self.super_pacgum.remove(maze_pos)
