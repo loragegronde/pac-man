@@ -40,6 +40,7 @@ class Mob:
     inky: dict[int, list[pygame.Surface]]
     pac: dict[int, list[pygame.Surface]]
     pac_man_spawn: list[pygame.Surface]
+    afraid: dict[str, list[pygame.Surface]]
 
 
 class Assets:
@@ -203,6 +204,16 @@ class Assets:
             1: [pac_man_u1, pac_man_u2, pac_man_u3],
         }
 
+        afraid_1: pygame.Surface = crop(img, 1, 553, 35, 35)
+        afraid_2: pygame.Surface = crop(img, 1, 603, 35, 35)
+        flash_1: pygame.Surface = crop(img, 51, 553, 35, 35)
+        flash_2: pygame.Surface = crop(img, 51, 603, 35, 35)
+
+        afraid = {
+            "normal": [afraid_1, afraid_2],
+            "flash": [flash_1, flash_2]
+        }
+
         pac_man_spawn: list[pygame.Surface] = [
             crop(img, 351, 4 + (i * 50), 35, 35) for i in range(11)
         ]
@@ -213,6 +224,7 @@ class Assets:
             inky=inky,
             pac=pac,
             pac_man_spawn=pac_man_spawn,
+            afraid=afraid,
         )
 
     def menu_layout(self, screen_w: int, screen_h: int) -> MenuLayout:

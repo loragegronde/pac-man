@@ -1,6 +1,7 @@
 from src.assets import Assets
 from src.visual.maze import Maze
 from src.visual.player import Player
+from src.visual.enemy_handler import EnemyHandler
 import pygame
 
 
@@ -15,6 +16,9 @@ class GameMode:
         self.player = Player(
             self.maze, self.assets.get_mobs(), window, self.maze_pos
         )
+        self.ghosts = EnemyHandler(
+            self.maze_pos, self.window, self.assets.get_mobs(), self.maze
+        )
         self.nb_pacgum = nb_pacgum
         self.define_pacgum_pos()
 
@@ -24,6 +28,7 @@ class GameMode:
         for i in range(4):
             self.check_interaction()
             self.player.update_pos(dt)
+        self.ghosts.refresh_frame()
 
     def get_direction(self, event: pygame.event.Event) -> None:
         if event.type != pygame.KEYDOWN:

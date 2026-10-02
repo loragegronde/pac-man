@@ -28,6 +28,9 @@ class Maze:
 
     def __init__(self) -> None:
         self.maze = MazeGenerator().maze
+        self.forty_two = {(i, j) for i in range(len(self.maze[0]))
+                          for j in range(len(self.maze))
+                          if self.maze[j][i] == 15}
         self.define_angles()
 
     def define_angles(self) -> None:
@@ -38,17 +41,32 @@ class Maze:
             1: (2, 8, (1, 0), (-1, 0), self.ANGLES[1]),
         }
 
+    def modify_42(self, i: int, j: int):
+        wall = 15
+        if (i - 1, j) in self.forty_two:
+            wall -= 8
+        if (i, j + 1) in self.forty_two:
+            wall -= 4
+        if (i + 1, j) in self.forty_two:
+            wall -= 2
+        if (i, j - 1) in self.forty_two:
+            wall -= 1
+        self.maze[j][i] = wall
+
     def create_maze(self, img: pygame.Surface):
         self.img = img
+        for cell in self.forty_two:
+            self.modify_42(*cell)
         for j in range(len(self.maze)):
             for i in range(len(self.maze[j])):
                 self.draw_cell(self.maze[j][i], (i, j))
+        for cell in self.forty_two:
+            i, j = cell
+            self.maze[j][i] = 15
 
     def draw_cell(self, wall: int, coordinates: tuple[int, int]):
         x, y = coordinates
         cell = wall
-        if wall == 15:
-            return
         if wall & 8:
             wall -= 8
             left, right, coord_l, coord_r, pixels = self.angles[8]

@@ -21,6 +21,6 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print("config file not found")
         exit(1)
-    except Exception as e:
+    except FileExistsError as e:
         print(e)
         exit(1)
