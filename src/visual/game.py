@@ -24,11 +24,15 @@ class GameMode:
 
     def refresh_frame(self, dt: float) -> None:
         _ = self.window.blit(self.maze.img, self.maze_pos)
+        if self.is_player_dead():
+            self.player.define_start_pos()
+            for i in range(len(self.ghosts.ghosts)):
+                self.ghosts.ghosts[i].define_pos()
         self.place_pacgum()
         for i in range(4):
             self.check_interaction()
             self.player.update_pos(dt)
-        self.ghosts.refresh_frame()
+        self.ghosts.refresh_frame(dt)
 
     def get_direction(self, event: pygame.event.Event) -> None:
         if event.type != pygame.KEYDOWN:
@@ -110,3 +114,12 @@ class GameMode:
                 self.pacgums_missing -= 1
             if maze_pos in self.super_pacgum:
                 self.super_pacgum.remove(maze_pos)
+
+    def is_player_dead(self):
+        min_x, min_y = self.player.pos
+        max_x, max_y = min_x + 35, min_y + 35
+        for ghost in self.ghosts.ghosts:
+            x, y = ghost.pos
+            if min_x <= x <= max_x and min_y <= y <= max_y:
+                return True
+        return False

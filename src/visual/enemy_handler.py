@@ -18,6 +18,8 @@ class EnemyHandler():
 
     def draw_ghosts(self) -> None:
         for ghost in self.ghosts:
+            for i in range(2):
+                ghost.update_pos()
             img_x, img_y = self.img_pos
             x, y = ghost.pos
             _ = self.window.blit(

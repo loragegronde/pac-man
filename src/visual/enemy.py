@@ -35,3 +35,7 @@ class Enemy(ABC):
         if new_x % 50 == 7 and new_y % 50 == 7:
             self.maze_pos = (new_x // 50, new_y // 50)
         self.pos = (new_x, new_y)
+
+    @abstractmethod
+    def define_pos(self):
+        ...
