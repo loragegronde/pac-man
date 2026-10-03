@@ -28,14 +28,13 @@ class Player:
         self.maze_pos = (max_x // 2, max_y // 2)
         self.pos = (self.maze_pos[0] * 50 + 7, self.maze_pos[1] * 50 + 7)
 
-    def update_pos(self, dt: float = 0.0):
+    def update_pos(self, dt: float = 0.0, update: bool = True):
         self.dt += dt
         self.define_movement()
         maze_x, maze_y = self.maze_pos
         x, y = self.pos
-        if not self.maze.maze[maze_y][maze_x] & self.direction or (
-            x % 50 != 7 or y % 50 != 7
-        ):
+        if (not self.maze.maze[maze_y][maze_x] & self.direction or (
+                x % 50 != 7 or y % 50 != 7)) and update:
             next_x, next_y = self.vector[self.direction]
         else:
             next_x, next_y = 0, 0

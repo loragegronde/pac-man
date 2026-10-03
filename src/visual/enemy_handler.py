@@ -1,4 +1,7 @@
 from src.visual.blinky import Blinky
+from src.visual.clyde import Clyde
+from src.visual.inky import Inky
+from src.visual.pinky import Pinky
 from src.assets import Mob
 from src.visual.enemy import Enemy
 
@@ -13,13 +16,17 @@ class EnemyHandler():
 
     def create_ghosts(self, assets: Mob, maze):
         self.ghosts: list[Enemy] = [
-            Blinky(assets.blinky, assets.afraid, maze)
+            Blinky(assets.blinky, assets.afraid, maze),
+            Clyde(assets.clyde, assets.afraid, maze),
+            Inky(assets.inky, assets.afraid, maze),
+            Pinky(assets.pinky, assets.afraid, maze)
         ]
 
-    def draw_ghosts(self) -> None:
+    def draw_ghosts(self, update: bool) -> None:
         for ghost in self.ghosts:
             for i in range(2):
-                ghost.update_pos()
+                if update:
+                    ghost.update_pos()
             img_x, img_y = self.img_pos
             x, y = ghost.pos
             _ = self.window.blit(
@@ -27,9 +34,9 @@ class EnemyHandler():
                 (x + img_x, y + img_y),
             )
 
-    def refresh_frame(self, dt: float = 0.0):
+    def refresh_frame(self, dt: float = 0.0, update: bool = True):
         self.dt += dt
         if self.dt > 0.2:
             self.frame = (self.frame + 1) % 2
             self.dt -= 0.2
-        self.draw_ghosts()
+        self.draw_ghosts(update)

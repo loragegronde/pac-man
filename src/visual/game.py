@@ -21,14 +21,16 @@ class GameMode:
         )
         self.nb_pacgum = nb_pacgum
         self.define_pacgum_pos()
+        self.dead = False
+        self.dt: float = 0.0
+        self.frame: int = -1
 
     def refresh_frame(self, dt: float) -> None:
         _ = self.window.blit(self.maze.img, self.maze_pos)
-        if self.is_player_dead():
-            self.player.define_start_pos()
-            for i in range(len(self.ghosts.ghosts)):
-                self.ghosts.ghosts[i].define_pos()
         self.place_pacgum()
+        if self.dead:
+            return self.death_animation(dt)
+        self.dead = self.is_player_dead()
         for i in range(4):
             self.check_interaction()
             self.player.update_pos(dt)
@@ -119,7 +121,39 @@ class GameMode:
         min_x, min_y = self.player.pos
         max_x, max_y = min_x + 35, min_y + 35
         for ghost in self.ghosts.ghosts:
-            x, y = ghost.pos
-            if min_x <= x <= max_x and min_y <= y <= max_y:
+            ghost_min_x, ghost_min_y = ghost.pos
+            ghost_max_x, ghost_max_y = ghost_min_x + 35, ghost_min_y + 35
+            if ((min_x <= ghost_min_x <= max_x and
+                    min_y <= ghost_min_y <= max_y) or
+                    (min_x <= ghost_max_x <= max_x and
+                     min_y <= ghost_max_y <= max_y)):
                 return True
         return False
+
+    def death_animation(self, dt: float = 0.0):
+        dead_anim = self.assets.get_mobs().pac_man_spawn
+        self.dt += dt
+        if self.frame == -1:
+            time = 1
+        else:
+            time = 0.1
+        if self.dt > time:
+            self.frame += 1
+            self.dt -= time
+        if self.frame == len(dead_anim):
+            self.dead = False
+            self.frame = -1
+            self.player.define_start_pos()
+            for i in range(len(self.ghosts.ghosts)):
+                self.ghosts.ghosts[i].define_pos()
+            return
+        if self.frame == -1:
+            self.player.update_pos(update=False)
+            self.ghosts.refresh_frame(dt, update=False)
+        else:
+            x, y = self.player.pos
+            img_x, img_y = self.player.img_pos
+            _ = self.window.blit(
+                dead_anim[self.frame],
+                (x + img_x, y + img_y),
+            )
