@@ -6,7 +6,7 @@ from src.assets import Mob
 from src.visual.enemy import Enemy
 
 
-class EnemyHandler():
+class EnemyHandler:
     def __init__(self, img_pos, window, assets: Mob, maze) -> None:
         self.img_pos = img_pos
         self.window = window
@@ -19,7 +19,7 @@ class EnemyHandler():
             Blinky(assets.blinky, assets.afraid, maze),
             Clyde(assets.clyde, assets.afraid, maze),
             Inky(assets.inky, assets.afraid, maze),
-            Pinky(assets.pinky, assets.afraid, maze)
+            Pinky(assets.pinky, assets.afraid, maze),
         ]
 
     def draw_ghosts(self, update: bool) -> None:

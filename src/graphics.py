@@ -12,6 +12,7 @@ from src.assets import Assets
 from src.victory import Victory
 from src.game_over import GameOver
 from src.name_box import NameBox
+from src.pause import PauseMenu
 
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
@@ -72,14 +73,20 @@ class Graphics:
         self.menu: Menu = Menu(
             self.screen, width, height, self.highscores, self.assets
         )
-        self.game: GameMode = GameMode(self.screen, self.assets)
-        self.name_box: NameBox = NameBox(self.screen, self.assets)
+        self.game: GameMode = GameMode(self.screen, self.assets, config)
+        self.name_box: NameBox = NameBox(
+            self.screen, self.assets, width, height
+        )
         self.victory: Victory = Victory(
-            self.assets, self.screen, self.name_box
+            self.assets, self.screen, self.name_box, width, height
         )
         self.game_over: GameOver = GameOver(
-            self.assets, self.screen, self.name_box
+            self.assets, self.screen, self.name_box, width, height
         )
+        self.pause: PauseMenu = PauseMenu(
+            self.screen, self.assets, width, height
+        )
+        self.pause_bg: pygame.Surface | None = None
         self.last_score: int = 0
 
     def run(self) -> None:
@@ -106,19 +113,30 @@ class Graphics:
                         elif event.key == pygame.K_DOWN:
                             self.menu.scroll_by(1)
                         elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                            self.game.reset()
                             self.state = "playing"
                         elif event.key == pygame.K_ESCAPE:
                             self.running = False
                     elif self.state == "playing":
                         self.game.get_direction(event)
                         if event.key == pygame.K_ESCAPE:
-                            self.state = "menu"
+                            self.pause.reset()
+                            self.pause_bg = None
+                            self.state = "pause"
                         elif event.key == pygame.K_v:
                             self.name_box.reset()
                             self.state = "victory"
                         elif event.key == pygame.K_o:
                             self.name_box.reset()
                             self.state = "game_over"
+                    elif self.state == "pause":
+                        action = self.pause.handle_keydown(event)
+                        if action == "resume":
+                            self.pause_bg = None
+                            self.state = "playing"
+                        elif action == "menu":
+                            self.pause_bg = None
+                            self.state = "menu"
                     elif self.state in ("victory", "game_over"):
                         if event.key == pygame.K_ESCAPE:
                             self.state = "menu"
@@ -135,7 +153,16 @@ class Graphics:
                     if self.state == "menu":
                         clicked = self.menu.click_at(*event.pos)
                         if clicked == "playing":
+                            self.game.reset()
                             self.state = "playing"
+                    elif self.state == "pause":
+                        action = self.pause.click_at(*event.pos)
+                        if action == "resume":
+                            self.pause_bg = None
+                            self.state = "playing"
+                        elif action == "menu":
+                            self.pause_bg = None
+                            self.state = "menu"
                 elif event.type == pygame.MOUSEWHEEL and self.state == "menu":
                     self.menu.scroll_by(-event.y)
 
@@ -144,6 +171,14 @@ class Graphics:
                 self.menu.render(dt)
             elif self.state == "playing":
                 self.game.refresh_frame(dt)
+                self.last_score = self.game.score
+            elif self.state == "pause":
+                if self.pause_bg is None:
+                    self.game.refresh_frame(0.0)
+                    self.pause.dim_screen()
+                    self.pause_bg = self.screen.copy()
+                _ = self.screen.blit(self.pause_bg, (0, 0))
+                self.pause.render(dt)
             elif self.state == "victory":
                 self.victory.render(dt)
             elif self.state == "game_over":

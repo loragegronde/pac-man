@@ -33,8 +33,10 @@ class Player:
         self.define_movement()
         maze_x, maze_y = self.maze_pos
         x, y = self.pos
-        if (not self.maze.maze[maze_y][maze_x] & self.direction or (
-                x % 50 != 7 or y % 50 != 7)) and update:
+        if (
+            not self.maze.maze[maze_y][maze_x] & self.direction
+            or (x % 50 != 7 or y % 50 != 7)
+        ) and update:
             next_x, next_y = self.vector[self.direction]
         else:
             next_x, next_y = 0, 0

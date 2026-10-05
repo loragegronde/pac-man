@@ -7,8 +7,7 @@ class Pinky(Enemy):
         self.direction = 8
         self.define_pos()
 
-    def update_direction(self):
-        ...
+    def update_direction(self): ...
 
     def define_pos(self):
         max_y = len(self.maze.maze) - 1

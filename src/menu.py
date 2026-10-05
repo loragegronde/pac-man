@@ -174,11 +174,10 @@ class Menu:
         score_right = x + w - a.SCORE_RIGHT_PAD
 
         if self.highscores.empty:
-            ns = a.no_score
             _ = self.screen.blit(
-                ns,
+                a.no_score,
                 (
-                    x + (w - ns.get_width()) // 2,
+                    x + (w - a.no_score_w) // 2,
                     list_top + (a.VISIBLE_ROWS * a.ROW_H) // 2,
                 ),
             )
@@ -198,16 +197,15 @@ class Menu:
                 ry = list_top + row * a.ROW_H
                 rank_s = a.font.render(f"{idx + 1:2d}.", True, color)
                 name_s = a.font.render(name, True, color)
-                score_s = a.font.render(str(score), True, color)
+                score_str = str(score)
+                score_s = a.font.render(score_str, True, color)
+                score_w, _ = a.font.size(score_str)
                 _ = self.screen.blit(rank_s, (rank_x, ry))
                 _ = self.screen.blit(name_s, (name_x, ry))
-                _ = self.screen.blit(
-                    score_s, (score_right - score_s.get_width(), ry)
-                )
+                _ = self.screen.blit(score_s, (score_right - score_w, ry))
 
         _ = self.screen.blit(a.up_arrow, lay.up_arrow.topleft)
         _ = self.screen.blit(a.down_arrow, lay.down_arrow.topleft)
-
 
     def click_at(self, mx: int, my: int) -> str | None:
         a = self.assets

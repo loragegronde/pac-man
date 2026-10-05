@@ -11,20 +11,21 @@ class NameBox:
     BOX_W: int = 550
     BOX_H: int = 90
 
-    def __init__(self, screen: pygame.Surface, assets: Assets) -> None:
+    def __init__(
+        self,
+        screen: pygame.Surface,
+        assets: Assets,
+        screen_w: int,
+        screen_h: int,
+    ) -> None:
         self.screen: pygame.Surface = screen
         self.assets: Assets = assets
         self.text: str = ""
         self.blink_time: float = 0.0
         self.show_cursor: bool = True
         self.typing_idle: float = 0.0
-        self._place()
-
-    def _place(self) -> None:
-        sw = self.screen.get_width()
-        sh = self.screen.get_height()
-        self.x: int = (sw - self.BOX_W) // 2
-        self.y: int = sh // 2 + 40
+        self.x: int = (screen_w - self.BOX_W) // 2
+        self.y: int = screen_h // 2 + 40
 
     def reset(self) -> None:
         self.text = ""
@@ -81,23 +82,20 @@ class NameBox:
             radius=a.BORDER_RADIUS,
         )
 
-        label = a.font_medium.render("ENTER NAME", True, (200, 200, 210))
+        label_text = "ENTER NAME"
+        label = a.font_medium.render(label_text, True, (200, 200, 210))
+        label_w, _ = a.font_medium.size(label_text)
         _ = self.screen.blit(
             label,
-            (
-                self.x + (self.BOX_W - label.get_width()) // 2,
-                self.y - 50,
-            ),
+            (self.x + (self.BOX_W - label_w) // 2, self.y - 50),
         )
 
         display = self.text
         if self.show_cursor and len(self.text) < self.MAX_LEN:
             display = self.text + "|"
         name_surf = a.font_large.render(display, True, (230, 230, 190))
+        name_w, _ = a.font_large.size(display)
         _ = self.screen.blit(
             name_surf,
-            (
-                self.x + (self.BOX_W - name_surf.get_width()) // 2,
-                self.y + 20,
-            ),
+            (self.x + (self.BOX_W - name_w) // 2, self.y + 20),
         )

@@ -19,8 +19,7 @@ class Enemy(ABC):
         }
 
     @abstractmethod
-    def update_direction(self):
-        ...
+    def update_direction(self): ...
 
     def update_pos(self):
         maze_x, maze_y = self.maze_pos
@@ -37,5 +36,4 @@ class Enemy(ABC):
         self.pos = (new_x, new_y)
 
     @abstractmethod
-    def define_pos(self):
-        ...
+    def define_pos(self): ...

@@ -1,20 +1,24 @@
+from pathlib import Path
+
 import pygame
 
-_ = pygame.init()
-screen = pygame.display.set_mode((1900, 1200))
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                running = False
-    title = pygame.font.Font("pacman_font.ttf", 150)
-    play = title.render("VICTORY !", True, (255, 255, 0))
-    # play_hovered = title.render("P", True, (255, 155, 0))
-    _ = screen.blit(play, (200, 200))
-    # _ = screen.blit(play_hovered, (200, 300))
-    pygame.image.save(play, "assets/win.png")
-    # pygame.image.save(play_hovered, "assets/play_hovered.png")
-    pygame.display.flip()
+ASSETS = Path("assets")
+FONT_PATH = Path("pacman_font.ttf")
+LABEL_COLOR = (200, 200, 210)
+
+
+def generate_hud_sprites() -> None:
+    _ = pygame.init()
+    _ = pygame.display.set_mode((1, 1))
+    font = pygame.font.Font(str(FONT_PATH), 42)
+    ASSETS.mkdir(exist_ok=True)
+
+    for label in ("SCORE", "LIVES", "LEVEL", "TIME"):
+        surf = font.render(label, True, LABEL_COLOR)
+        _ = pygame.image.save(surf, str(ASSETS / f"hud_{label.lower()}.png"))
+
+    pygame.quit()
+
+
+if __name__ == "__main__":
+    generate_hud_sprites()

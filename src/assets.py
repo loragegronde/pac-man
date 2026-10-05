@@ -51,6 +51,13 @@ class Assets:
     PLAY_W: int = 440
     PLAY_H: int = 123
 
+    HS_BANNER_SRC_W: int = 614
+    HS_BANNER_SRC_H: int = 75
+    VICTORY_W: int = 1022
+    VICTORY_H: int = 160
+    GAME_OVER_W: int = 1136
+    GAME_OVER_H: int = 175
+
     PANEL_W: int = 900
     VISIBLE_ROWS: int = 10
 
@@ -82,12 +89,15 @@ class Assets:
         self.victory: pygame.Surface = self._load("victory.png")
         self.game_over: pygame.Surface = self._load("game_over.png")
 
+        self.victory_w: int = self.VICTORY_W
+        self.victory_h: int = self.VICTORY_H
+        self.game_over_w: int = self.GAME_OVER_W
+        self.game_over_h: int = self.GAME_OVER_H
+
         banner_w = self.PANEL_W - self.BANNER_INSET
         banner_h = max(
             48,
-            self.hs_banner.get_height()
-            * banner_w
-            // self.hs_banner.get_width(),
+            self.HS_BANNER_SRC_H * banner_w // self.HS_BANNER_SRC_W,
         )
         self.hs_banner_w: int = banner_w
         self.hs_banner_h: int = banner_h
@@ -100,16 +110,26 @@ class Assets:
         self.font_medium: pygame.font.Font = pygame.font.Font(None, 50)
         self.font_large: pygame.font.Font = pygame.font.Font(None, 80)
 
+        hint_text = "ENTER / CLICK PLAY"
         self.hint: pygame.Surface = self.font_hint.render(
-            "ENTER / CLICK PLAY", True, (200, 200, 210)
+            hint_text, True, (200, 200, 210)
         )
-        self.hint_w: int = self.hint.get_width()
-        self.hint_h: int = self.hint.get_height()
+        self.hint_w: int = self.font_hint.size(hint_text)[0]
+        self.hint_h: int = self.font_hint.size(hint_text)[1]
 
+        no_score_text = "no-score"
         self.no_score: pygame.Surface = self.font.render(
-            "no-score", True, (180, 180, 190)
+            no_score_text, True, (180, 180, 190)
         )
+        self.no_score_w: int = self.font.size(no_score_text)[0]
+        self.no_score_h: int = self.font.size(no_score_text)[1]
         self.get_pacgum()
+        self.hud_labels: dict[str, pygame.Surface] = {
+            "SCORE": self._load("hud_score.png"),
+            "LIVES": self._load("hud_lives.png"),
+            "LEVEL": self._load("hud_level.png"),
+            "TIME": self._load("hud_time.png"),
+        }
 
     def _load(self, name: str) -> pygame.Surface:
         return pygame.image.load(str(self.root / name)).convert_alpha()
@@ -209,10 +229,7 @@ class Assets:
         flash_1: pygame.Surface = crop(img, 51, 553, 35, 35)
         flash_2: pygame.Surface = crop(img, 51, 603, 35, 35)
 
-        afraid = {
-            "normal": [afraid_1, afraid_2],
-            "flash": [flash_1, flash_2]
-        }
+        afraid = {"normal": [afraid_1, afraid_2], "flash": [flash_1, flash_2]}
 
         pac_man_spawn: list[pygame.Surface] = [
             crop(img, 351, 4 + (i * 50), 35, 35) for i in range(11)

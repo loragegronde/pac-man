@@ -7,8 +7,7 @@ class Blinky(Enemy):
         self.direction = 2
         self.define_pos()
 
-    def update_direction(self):
-        ...
+    def update_direction(self): ...
 
     def define_pos(self):
         self.maze_pos = (1, 0)

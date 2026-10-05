@@ -28,9 +28,12 @@ class Maze:
 
     def __init__(self) -> None:
         self.maze = MazeGenerator().maze
-        self.forty_two = {(i, j) for i in range(len(self.maze[0]))
-                          for j in range(len(self.maze))
-                          if self.maze[j][i] == 15}
+        self.forty_two = {
+            (i, j)
+            for i in range(len(self.maze[0]))
+            for j in range(len(self.maze))
+            if self.maze[j][i] == 15
+        }
         self.define_angles()
 
     def define_angles(self) -> None:
