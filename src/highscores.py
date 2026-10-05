@@ -1,8 +1,10 @@
+"""Highscore persistence: JSON list of {name, score}."""
+
 from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 ScoreEntry = dict[str, Any]
 
@@ -26,11 +28,12 @@ class Highscores:
                 self.error = True
                 return
             cleaned: list[ScoreEntry] = []
-            for item in raw:
+            for item in cast(list[object], raw):
                 if not isinstance(item, dict):
                     continue
-                name = item.get("name")
-                score = item.get("score")
+                entry = cast(dict[str, object], item)
+                name = entry.get("name")
+                score = entry.get("score")
                 if not isinstance(name, str) or not isinstance(score, int):
                     continue
                 if score < 0:
