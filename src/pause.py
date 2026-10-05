@@ -88,7 +88,6 @@ class PauseMenu:
             (self.x + (self.BOX_W - title_w) // 2, self.y + 36),
         )
 
-        # Build hitboxes first, then hover updates selection
         self._option_rects = []
         oy = self.y + 120
         layout: list[tuple[str, int, int, int]] = []
