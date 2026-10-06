@@ -58,7 +58,7 @@ class GameMode:
                 self.score, self.lives, self.level, self.time_left, dt
             )
             return
-        self.time_left = max(0.0, self.time_left - dt)
+        self.time_left = self.time_left - dt
         self.dead = self.is_player_dead()
         for _ in range(4):
             self.check_interaction()
