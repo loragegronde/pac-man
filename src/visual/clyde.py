@@ -13,3 +13,4 @@ class Clyde(Enemy):
         max_x = len(self.maze.maze[0]) - 1
         self.maze_pos = (max_x, 1)
         self.pos = (max_x * 50 + 7, 57)
+        self.state = 0

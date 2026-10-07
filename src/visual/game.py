@@ -59,7 +59,7 @@ class GameMode:
             )
             return
         self.time_left = self.time_left - dt
-        self.dead = self.is_player_dead()
+        self.is_player_dead()
         for _ in range(4):
             self.check_interaction()
             self.player.update_pos(dt)
@@ -154,6 +154,8 @@ class GameMode:
             if maze_pos in self.super_pacgum:
                 self.super_pacgum.remove(maze_pos)
                 self.score += self.config.points_per_super_pacgum
+                for i in range(len(self.ghosts.ghosts)):
+                    self.ghosts.ghosts[i].state = 5
 
     def is_player_dead(self):
         min_x, min_y = self.player.pos
@@ -166,8 +168,10 @@ class GameMode:
             ) or (
                 min_x <= ghost_max_x <= max_x and min_y <= ghost_max_y <= max_y
             ):
-                return True
-        return False
+                if ghost.state > 0:
+                    ghost.state = 0
+                else:
+                    self.dead = True
 
     def death_animation(self, dt: float = 0.0):
         dead_anim = self.assets.get_mobs().pac_man_spawn
