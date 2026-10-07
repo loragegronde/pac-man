@@ -12,3 +12,4 @@ class Blinky(Enemy):
     def define_pos(self):
         self.maze_pos = (1, 0)
         self.pos = (57, 7)
+        self.state = 0

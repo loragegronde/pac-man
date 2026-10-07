@@ -13,3 +13,4 @@ class Pinky(Enemy):
         max_y = len(self.maze.maze) - 1
         self.maze_pos = (0, max_y - 1)
         self.pos = (7, (max_y - 1) * 50 + 7)
+        self.state = 0

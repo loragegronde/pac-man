@@ -47,13 +47,13 @@ class Player:
             self.movement[self.direction][self.frame % 3],
             (new_x + img_x, new_y + img_y),
         )
-        if self.dt > 0.2:
+        if self.dt > 0.3:
             if self.frame >= 2:
                 self.mov = -1
             if self.frame <= 0:
                 self.mov = 1
             self.frame = self.frame + self.mov % 3
-            self.dt -= 0.2
+            self.dt -= 0.3
 
     def define_movement(self):
         x, y = self.pos

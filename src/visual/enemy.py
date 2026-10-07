@@ -7,6 +7,7 @@ class Enemy(ABC):
 
     def __init__(self, assets, afraid, maze) -> None:
         self.direction: int = 1
+        self.state: float = 0.0
         self.assets = assets
         self.afraid = afraid
         self.maze = maze

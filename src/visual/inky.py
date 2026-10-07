@@ -14,3 +14,4 @@ class Inky(Enemy):
         max_y = len(self.maze.maze) - 1
         self.maze_pos = (max_x, max_y)
         self.pos = ((max_x - 1) * 50 + 7, (max_y) * 50 + 7)
+        self.state = 0
