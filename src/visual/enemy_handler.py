@@ -7,9 +7,7 @@ from src.visual.enemy import Enemy
 
 
 class EnemyHandler:
-    def __init__(self, img_pos, window, assets: Mob, maze) -> None:
-        self.img_pos = img_pos
-        self.window = window
+    def __init__(self, assets: Mob, maze) -> None:
         self.create_ghosts(assets, maze)
         self.dt: float = 0
         self.frame = 0
@@ -22,30 +20,8 @@ class EnemyHandler:
             Pinky(assets.pinky, assets.afraid, maze),
         ]
 
-    def draw_ghosts(self, update: bool, dt: float = 0.0) -> None:
+    def refresh_frame(self, dt: float = 0.0, update: bool = True):
         for i, ghost in enumerate(self.ghosts):
-            if ghost.state > 0:
-                if ghost.state < 2 and 0 <= ghost.state % 0.4 < 0.2:
-                    state = "flash"
-                else:
-                    state = "normal"
-                asset = ghost.afraid[state][self.frame]
-                self.ghosts[i].state -= dt
-            else:
-                asset = ghost.assets[ghost.direction][self.frame]
             for i in range(2):
                 if update:
                     ghost.update_pos()
-            img_x, img_y = self.img_pos
-            x, y = ghost.pos
-            _ = self.window.blit(
-                asset,
-                (x + img_x, y + img_y),
-            )
-
-    def refresh_frame(self, dt: float = 0.0, update: bool = True):
-        self.dt += dt
-        if self.dt > 0.2:
-            self.frame = (self.frame + 1) % 2
-            self.dt -= 0.2
-        self.draw_ghosts(update, dt)

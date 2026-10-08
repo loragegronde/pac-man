@@ -26,8 +26,8 @@ class Maze:
     # left/ right angles
     # interior/exterior
 
-    def __init__(self) -> None:
-        self.maze = MazeGenerator().maze
+    def __init__(self, size: tuple[int, int]) -> None:
+        self.maze = MazeGenerator(size).maze
         self.forty_two = {
             (i, j)
             for i in range(len(self.maze[0]))
