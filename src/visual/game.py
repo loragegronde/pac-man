@@ -9,19 +9,19 @@ import pygame
 
 class GameMode:
     def __init__(
-        self, window: pygame.Surface, assets: Assets, config: Config
+        self, window: pygame.Surface, assets: Assets, config: Config, size: tuple[int, int]
     ) -> None:
         self.maze_pos = (300, 25)
         self.window = window
         self.assets = assets
         self.config = config
-        self.maze = Maze()
+        self.maze = Maze(size)
         self.maze.create_maze(pygame.Surface((750, 750)))
         self.player = Player(
-            self.maze, self.assets.get_mobs(), window, self.maze_pos
+            self.maze, self.assets.get_mobs()
         )
         self.ghosts = EnemyHandler(
-            self.maze_pos, self.window, self.assets.get_mobs(), self.maze
+            self.assets.get_mobs(), self.maze
         )
         self.hud = Hud(window, assets)
         self.nb_pacgum = config.pacgum
