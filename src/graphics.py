@@ -13,6 +13,8 @@ from src.victory import Victory
 from src.game_over import GameOver
 from src.name_box import NameBox
 from src.pause import PauseMenu
+from src.cheats import Cheats
+from src.cheat_menu import CheatMenu
 
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
@@ -73,6 +75,7 @@ class Graphics:
         self.menu: Menu = Menu(
             self.screen, width, height, self.highscores, self.assets
         )
+        self.cheats: Cheats = Cheats()
         self.game: GameMode = GameMode(self.screen, self.assets, config)
         self.name_box: NameBox = NameBox(
             self.screen, self.assets, width, height
@@ -85,6 +88,14 @@ class Graphics:
         )
         self.pause: PauseMenu = PauseMenu(
             self.screen, self.assets, width, height
+        )
+        self.cheat_menu: CheatMenu = CheatMenu(
+            self.screen,
+            self.assets,
+            width,
+            height,
+            self.cheats,
+            self.game,
         )
         self.pause_bg: pygame.Surface | None = None
         self.last_score: int = 0
@@ -134,9 +145,17 @@ class Graphics:
                         if action == "resume":
                             self.pause_bg = None
                             self.state = "playing"
+                        elif action == "cheats":
+                            self.cheat_menu.reset()
+                            self.state = "cheats"
                         elif action == "menu":
                             self.pause_bg = None
                             self.state = "menu"
+                    elif self.state == "cheats":
+                        action = self.cheat_menu.handle_keydown(event)
+                        if action == "back":
+                            self.pause.reset()
+                            self.state = "pause"
                     elif self.state in ("victory", "game_over"):
                         if event.key == pygame.K_ESCAPE:
                             self.state = "menu"
@@ -160,9 +179,23 @@ class Graphics:
                         if action == "resume":
                             self.pause_bg = None
                             self.state = "playing"
+                        elif action == "cheats":
+                            self.cheat_menu.reset()
+                            self.state = "cheats"
                         elif action == "menu":
                             self.pause_bg = None
                             self.state = "menu"
+                    elif self.state == "cheats":
+                        action = self.cheat_menu.click_at(*event.pos)
+                        if action == "back":
+                            self.pause.reset()
+                            self.state = "pause"
+                elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                    if self.state == "cheats":
+                        self.cheat_menu.mouse_up()
+                elif event.type == pygame.MOUSEMOTION:
+                    if self.state == "cheats":
+                        self.cheat_menu.mouse_move(*event.pos)
                 elif event.type == pygame.MOUSEWHEEL and self.state == "menu":
                     self.menu.scroll_by(-event.y)
 
@@ -179,6 +212,13 @@ class Graphics:
                     self.pause_bg = self.screen.copy()
                 _ = self.screen.blit(self.pause_bg, (0, 0))
                 self.pause.render(dt)
+            elif self.state == "cheats":
+                if self.pause_bg is None:
+                    self.game.refresh_frame(0.0)
+                    self.pause.dim_screen()
+                    self.pause_bg = self.screen.copy()
+                _ = self.screen.blit(self.pause_bg, (0, 0))
+                self.cheat_menu.render(dt)
             elif self.state == "victory":
                 self.victory.render(dt)
             elif self.state == "game_over":

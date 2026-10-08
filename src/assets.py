@@ -78,6 +78,15 @@ class Assets:
     ARROW_GAP: int = 16
     ARROW_BOTTOM: int = 48
 
+    # hardcoded text metrics (no font.size / get_width)
+    DIGIT_W: int = 16
+    CHAR_W_MEDIUM: int = 26
+    CHAR_W_LARGE: int = 37
+    HINT_W: int = 352
+    HINT_H: int = 34
+    NO_SCORE_W: int = 116
+    NO_SCORE_H: int = 27
+
     def __init__(self, root: Path = ASSETS_DIR) -> None:
         self.root: Path = root
 
@@ -114,15 +123,15 @@ class Assets:
         self.hint: pygame.Surface = self.font_hint.render(
             hint_text, True, (200, 200, 210)
         )
-        self.hint_w: int = self.font_hint.size(hint_text)[0]
-        self.hint_h: int = self.font_hint.size(hint_text)[1]
+        self.hint_w: int = self.HINT_W
+        self.hint_h: int = self.HINT_H
 
         no_score_text = "no-score"
         self.no_score: pygame.Surface = self.font.render(
             no_score_text, True, (180, 180, 190)
         )
-        self.no_score_w: int = self.font.size(no_score_text)[0]
-        self.no_score_h: int = self.font.size(no_score_text)[1]
+        self.no_score_w: int = self.NO_SCORE_W
+        self.no_score_h: int = self.NO_SCORE_H
         self.get_pacgum()
         self.hud_labels: dict[str, pygame.Surface] = {
             "SCORE": self._load("hud_score.png"),

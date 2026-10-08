@@ -4,6 +4,10 @@ from src.assets import Assets, MenuLayout
 from src.highscores import Highscores, ScoreEntry
 
 
+def point_in(mx: int, my: int, x: int, y: int, w: int, h: int) -> bool:
+    return x <= mx < x + w and y <= my < y + h
+
+
 def draw_quarter_circle_outline(
     screen: pygame.Surface,
     cx: int,
@@ -199,7 +203,7 @@ class Menu:
                 name_s = a.font.render(name, True, color)
                 score_str = str(score)
                 score_s = a.font.render(score_str, True, color)
-                score_w, _ = a.font.size(score_str)
+                score_w = len(score_str) * a.DIGIT_W
                 _ = self.screen.blit(rank_s, (rank_x, ry))
                 _ = self.screen.blit(name_s, (name_x, ry))
                 _ = self.screen.blit(score_s, (score_right - score_w, ry))
@@ -210,15 +214,14 @@ class Menu:
     def click_at(self, mx: int, my: int) -> str | None:
         a = self.assets
         lay = self.layout
-        if lay.up_arrow.collidepoint(mx, my):
+        up = lay.up_arrow
+        down = lay.down_arrow
+        if point_in(mx, my, up.x, up.y, up.w, up.h):
             self.scroll_by(-1)
             return None
-        if lay.down_arrow.collidepoint(mx, my):
+        if point_in(mx, my, down.x, down.y, down.w, down.h):
             self.scroll_by(1)
             return None
-        if (
-            lay.play_x <= mx < lay.play_x + a.PLAY_W
-            and lay.play_y <= my < lay.play_y + a.PLAY_H
-        ):
+        if point_in(mx, my, lay.play_x, lay.play_y, a.PLAY_W, a.PLAY_H):
             return "playing"
         return None

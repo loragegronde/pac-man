@@ -15,8 +15,8 @@ class GameOver:
         self.assets: Assets = assets
         self.screen: pygame.Surface = screen
         self.name_box: NameBox = name_box
-        self.screen_w = screen_w
-        self.screen_h = screen_h
+        self.screen_w: int = screen_w
+        self.screen_h: int = screen_h
 
     def render(self, dt: float = 0.0) -> None:
         a = self.assets

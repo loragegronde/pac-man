@@ -10,6 +10,8 @@ class NameBox:
     MAX_LEN: int = 10
     BOX_W: int = 550
     BOX_H: int = 90
+    ENTER_NAME_W: int = 235
+    CHAR_W_LARGE: int = 37
 
     def __init__(
         self,
@@ -84,17 +86,16 @@ class NameBox:
 
         label_text = "ENTER NAME"
         label = a.font_medium.render(label_text, True, (200, 200, 210))
-        label_w, _ = a.font_medium.size(label_text)
         _ = self.screen.blit(
             label,
-            (self.x + (self.BOX_W - label_w) // 2, self.y - 50),
+            (self.x + (self.BOX_W - self.ENTER_NAME_W) // 2, self.y - 50),
         )
 
         display = self.text
         if self.show_cursor and len(self.text) < self.MAX_LEN:
             display = self.text + "|"
         name_surf = a.font_large.render(display, True, (230, 230, 190))
-        name_w, _ = a.font_large.size(display)
+        name_w = max(1, len(display)) * self.CHAR_W_LARGE
         _ = self.screen.blit(
             name_surf,
             (self.x + (self.BOX_W - name_w) // 2, self.y + 20),

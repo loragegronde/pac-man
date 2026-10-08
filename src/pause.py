@@ -3,14 +3,23 @@ from __future__ import annotations
 import pygame
 
 from src.assets import Assets
-from src.menu import draw_double_round_rect
+from src.menu import draw_double_round_rect, point_in
 
 
 class PauseMenu:
-    OPTIONS: tuple[str, ...] = ("RESUME", "MAIN MENU")
+    OPTIONS: tuple[str, ...] = ("RESUME", "CHEATS", "MAIN MENU")
+    LABEL_W: dict[str, int] = {
+        "RESUME": 147,
+        "CHEATS": 141,
+        "MAIN MENU": 201,
+    }
+    TITLE_W: int = 187
     BOX_W: int = 520
-    BOX_H: int = 280
+    BOX_H: int = 340
     DIM_COLOR: tuple[int, int, int] = (0, 0, 0)
+    ROW_H: int = 70
+    HIT_H: int = 48
+    HIT_PAD_X: int = 20
 
     def __init__(
         self,
@@ -26,7 +35,7 @@ class PauseMenu:
         self.selected: int = 0
         self.x: int = (screen_w - self.BOX_W) // 2
         self.y: int = (screen_h - self.BOX_H) // 2 - 40
-        self._option_rects: list[pygame.Rect] = []
+        self._option_hits: list[tuple[int, int, int, int]] = []
 
     def reset(self) -> None:
         self.selected = 0
@@ -43,15 +52,18 @@ class PauseMenu:
         return None
 
     def click_at(self, mx: int, my: int) -> str | None:
-        for i, rect in enumerate(self._option_rects):
-            if rect.collidepoint(mx, my):
+        for i, (x, y, w, h) in enumerate(self._option_hits):
+            if point_in(mx, my, x, y, w, h):
                 self.selected = i
                 return self._action()
         return None
 
     def _action(self) -> str:
-        if self.OPTIONS[self.selected] == "RESUME":
+        choice = self.OPTIONS[self.selected]
+        if choice == "RESUME":
             return "resume"
+        if choice == "CHEATS":
+            return "cheats"
         return "menu"
 
     def dim_screen(self) -> None:
@@ -82,30 +94,34 @@ class PauseMenu:
         )
 
         title = a.font_large.render("PAUSE", True, (255, 220, 80))
-        title_w, _ = a.font_large.size("PAUSE")
         _ = self.screen.blit(
             title,
-            (self.x + (self.BOX_W - title_w) // 2, self.y + 36),
+            (self.x + (self.BOX_W - self.TITLE_W) // 2, self.y + 36),
         )
 
-        self._option_rects = []
+        self._option_hits = []
         oy = self.y + 120
-        layout: list[tuple[str, int, int, int]] = []
+        layout: list[tuple[str, int, int]] = []
         for label in self.OPTIONS:
-            text_w, _ = a.font_medium.size(label)
+            text_w = self.LABEL_W[label]
             rx = self.x + (self.BOX_W - text_w) // 2
-            self._option_rects.append(
-                pygame.Rect(rx - 20, oy - 8, text_w + 40, 48)
+            self._option_hits.append(
+                (
+                    rx - self.HIT_PAD_X,
+                    oy - 8,
+                    text_w + 2 * self.HIT_PAD_X,
+                    self.HIT_H,
+                )
             )
-            layout.append((label, rx, oy, text_w))
-            oy += 60
+            layout.append((label, rx, oy))
+            oy += self.ROW_H
 
-        for i, rect in enumerate(self._option_rects):
-            if rect.collidepoint(mx, my):
+        for i, (x, y, w, h) in enumerate(self._option_hits):
+            if point_in(mx, my, x, y, w, h):
                 self.selected = i
                 break
 
-        for i, (label, rx, oy, _text_w) in enumerate(layout):
+        for i, (label, rx, oy) in enumerate(layout):
             color = (255, 255, 120) if i == self.selected else (220, 220, 230)
             surf = a.font_medium.render(label, True, color)
             _ = self.screen.blit(surf, (rx, oy))
