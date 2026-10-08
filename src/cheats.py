@@ -13,7 +13,7 @@ class Cheats:
     speed_mult: float = 1.0
 
     CONFLICTS: ClassVar[dict[str, tuple[str, ...]]] = {
-        "always_chase": ("ghost",),
+        "always_chase": ("ghost_freeze",),
         "ghost_freeze": ("always_chase",),
     }
 
