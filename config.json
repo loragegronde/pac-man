@@ -7,5 +7,5 @@
   "points_per_ghost": 200,
   "seed": 42,
   "level_max_time": 90,
-  "fps": 60
+  "fps": 120
 }
