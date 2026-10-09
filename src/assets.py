@@ -41,6 +41,7 @@ class Mob:
     pac: dict[int, list[pygame.Surface]]
     pac_man_spawn: list[pygame.Surface]
     afraid: dict[str, list[pygame.Surface]]
+    dead: dict[int, pygame.Surface]
 
 
 class Assets:
@@ -78,7 +79,6 @@ class Assets:
     ARROW_GAP: int = 16
     ARROW_BOTTOM: int = 48
 
-    # hardcoded text metrics (no font.size / get_width)
     DIGIT_W: int = 16
     CHAR_W_MEDIUM: int = 26
     CHAR_W_LARGE: int = 37
@@ -243,6 +243,19 @@ class Assets:
         pac_man_spawn: list[pygame.Surface] = [
             crop(img, 351, 4 + (i * 50), 35, 35) for i in range(11)
         ]
+
+        dead_r = crop(img, 301, 254, 35, 35)
+        dead_d = crop(img, 301, 304, 35, 35)
+        dead_l = crop(img, 301, 354, 35, 35)
+        dead_u = crop(img, 301, 404, 35, 35)
+        for eye in (dead_r, dead_d, dead_l, dead_u):
+            _ = eye.set_colorkey((0, 0, 0))
+        dead: dict[int, pygame.Surface] = {
+            2: dead_r,
+            4: dead_d,
+            8: dead_l,
+            1: dead_u,
+        }
         return Mob(
             blinky=blinky,
             pinky=pinky,
@@ -251,6 +264,7 @@ class Assets:
             pac=pac,
             pac_man_spawn=pac_man_spawn,
             afraid=afraid,
+            dead=dead
         )
 
     def menu_layout(self, screen_w: int, screen_h: int) -> MenuLayout:

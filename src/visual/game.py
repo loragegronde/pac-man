@@ -136,12 +136,15 @@ class GameMode:
             ) or (
                 min_x <= ghost_max_x <= max_x and min_y <= ghost_max_y <= max_y
             ):
-                if ghost.is_afraid:
+                if ghost.state > 0:
                     self.score += config.points_per_ghost << self.ghost_combo
                     self.ghost_combo += 1
-                    ghost.state = 0.0
                     ghost.dead = True
+                    ghost.state = 0.0
+                    ghost.dead_wait = 0
+                    mx, my = ghost.maze_pos
+                    ghost.pos = (mx * 50 + 7, my * 50 + 7)
                     self.eat_freeze = 1.0
                     return
-                elif not self.cheats.invincibility:
+                if not self.cheats.invincibility:
                     self.dead = True

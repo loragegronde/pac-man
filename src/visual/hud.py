@@ -28,7 +28,7 @@ class Hud:
         rows = (
             ("SCORE", str(score)),
             ("LIVES", str(lives)),
-            ("LEVEL", str(level)),
+            ("LEVEL", str(level + 1)),
             ("TIME", self._format_time(time_left)),
         )
         y = self.y

@@ -150,20 +150,18 @@ class LevelHandler:
         game = self.mazes[self.level]
         img_x, img_y = game.maze_pos
 
-        for i, ghost in enumerate(game.ghosts.ghosts):
+        for ghost in game.ghosts.ghosts:
             if ghost.dead:
                 asset = ghost.dead_assets[ghost.direction]
-            elif ghost.is_afraid:
-                if ghost.state < 2 and 0 <= ghost.state % 0.4 < 0.2:
-                    state = "flash"
-                else:
-                    state = "normal"
+            elif ghost.state > 0:
+                state = (
+                    "flash"
+                    if ghost.state < 2 and 0 <= ghost.state % 0.4 < 0.2
+                    else "normal"
+                )
                 asset = ghost.afraid[state][self.frame // 5 % 2]
-                game.ghosts.ghosts[i].state = max(0.0, ghost.state - dt)
+                ghost.state = max(0.0, ghost.state - dt)
             else:
                 asset = ghost.assets[ghost.direction][self.frame // 5 % 2]
             x, y = ghost.pos
-            _ = self.window.blit(
-                asset,
-                (x + img_x, y + img_y),
-            )
+            _ = self.window.blit(asset, (x + img_x, y + img_y))
