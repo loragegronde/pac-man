@@ -36,14 +36,20 @@ class PauseMenu:
         self.x: int = (screen_w - self.BOX_W) // 2
         self.y: int = (screen_h - self.BOX_H) // 2 - 40
         self._option_hits: list[tuple[int, int, int, int]] = []
+        self._mouse_nav: bool = True
+        self._last_mouse: tuple[int, int] = (-1, -1)
 
     def reset(self) -> None:
         self.selected = 0
+        self._mouse_nav = True
+        self._last_mouse = (-1, -1)
 
     def handle_keydown(self, event: pygame.event.Event) -> str | None:
         if event.key == pygame.K_UP:
+            self._mouse_nav = False
             self.selected = (self.selected - 1) % len(self.OPTIONS)
         elif event.key == pygame.K_DOWN:
+            self._mouse_nav = False
             self.selected = (self.selected + 1) % len(self.OPTIONS)
         elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
             return self._action()
@@ -52,6 +58,8 @@ class PauseMenu:
         return None
 
     def click_at(self, mx: int, my: int) -> str | None:
+        self._mouse_nav = True
+        self._last_mouse = (mx, my)
         for i, (x, y, w, h) in enumerate(self._option_hits):
             if point_in(mx, my, x, y, w, h):
                 self.selected = i
@@ -116,10 +124,15 @@ class PauseMenu:
             layout.append((label, rx, oy))
             oy += self.ROW_H
 
-        for i, (x, y, w, h) in enumerate(self._option_hits):
-            if point_in(mx, my, x, y, w, h):
-                self.selected = i
-                break
+        moved = (mx, my) != self._last_mouse
+        self._last_mouse = (mx, my)
+        if moved:
+            self._mouse_nav = True
+        if self._mouse_nav:
+            for i, (x, y, w, h) in enumerate(self._option_hits):
+                if point_in(mx, my, x, y, w, h):
+                    self.selected = i
+                    break
 
         for i, (label, rx, oy) in enumerate(layout):
             color = (255, 255, 120) if i == self.selected else (220, 220, 230)
