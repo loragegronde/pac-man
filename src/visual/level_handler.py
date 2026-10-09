@@ -60,12 +60,12 @@ class LevelHandler:
                 self.score, self.lives, self.level, self.time_left, dt
             )
             return
-        game.update_frame(self.config)
+        game.update_frame(self.config, dt)
         self.time_left = self.time_left - dt
         self.draw_ghosts(dt)
         self.draw_player()
         self.hud.render(self.score, self.lives, self.level, self.time_left, dt)
-        self.frame = self.frame + 1 % 60
+        self.frame = self.frame + 1 % self.config.fps
 
     def death_animation(self, dt: float = 0.0):
         dead_anim = self.assets.get_mobs().pac_man_spawn
@@ -112,7 +112,11 @@ class LevelHandler:
             )
 
     def draw_player(self):
-        game = self.mazes[self.level]
+        game = (
+            self.mazes[self.level]
+            if self.level != 10
+            else self.mazes[self.level - 1]
+        )
         img_x, img_y = game.maze_pos
 
         p_x, p_y = game.player.pos
