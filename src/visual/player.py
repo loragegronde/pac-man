@@ -25,24 +25,33 @@ class Player:
         self.maze_pos = ((max_x - 1) // 2, (max_y - 1) // 2)
         self.pos = (self.maze_pos[0] * 50 + 7, self.maze_pos[1] * 50 + 7)
 
-    def update_pos(self):
+    def update_pos(self, speed: float):
         self.define_movement()
         maze_x, maze_y = self.maze_pos
         x, y = self.pos
-        if (
-            not self.maze.maze[maze_y][maze_x] & self.direction
-            or (x % 50 != 7 or y % 50 != 7)
+        if not self.maze.maze[maze_y][maze_x] & self.direction or (
+            x % 50 != 7 or y % 50 != 7
         ):
             next_x, next_y = self.vector[self.direction]
         else:
             next_x, next_y = 0, 0
+        next_cell = (
+            maze_x * 50 + (next_x * 50) + 7,
+            maze_y * 50 + (next_y * 50) + 7,
+        )
+        next_x *= speed
+        next_y *= speed
         new_x, new_y = (x + next_x, y + next_y)
-        self.pos = (new_x, new_y)
+        self.pos = (
+            max((new_x, new_y), next_cell)
+            if self.direction in {1, 8}
+            else min((new_x, new_y), next_cell)
+        )
 
     def define_movement(self):
         x, y = self.pos
         if x % 50 == 7 and y % 50 == 7:
-            self.maze_pos = (x // 50, y // 50)
+            self.maze_pos = (int(x // 50), int(y // 50))
         if (
             self.direction == self.next_direction
             or self.direction == self.opposite[self.next_direction]
@@ -51,7 +60,10 @@ class Player:
             return
         maze_x, maze_y = self.maze_pos
         if (
-            not self.maze.maze[maze_y][maze_x] & self.next_direction
+            (
+                not self.maze.maze[maze_y][maze_x] & self.next_direction
+                or self.maze.maze[maze_y][maze_x] & self.direction
+            )
             and x % 50 == 7
             and y % 50 == 7
         ):

@@ -3,23 +3,26 @@ from src.parsing import Config
 from src.visual.maze import Maze
 from src.visual.player import Player
 from src.visual.enemy_handler import EnemyHandler
+from src.cheats import Cheats
 import pygame
+import math
 
 
 class GameMode:
     def __init__(
-        self, assets: Assets, size: tuple[int, int], nb_pacgum: int
+        self,
+        assets: Assets,
+        size: tuple[int, int],
+        nb_pacgum: int,
+        cheats: Cheats,
     ) -> None:
         self.define_maze_pos(size)
         self.assets = assets
+        self.cheats = cheats
         self.maze = Maze(size)
         self.maze.create_maze(pygame.Surface((size[0] * 50, size[1] * 50)))
-        self.player = Player(
-            self.maze, self.assets.get_mobs()
-        )
-        self.ghosts = EnemyHandler(
-            self.assets.get_mobs(), self.maze
-        )
+        self.player = Player(self.maze, self.assets.get_mobs())
+        self.ghosts = EnemyHandler(self.assets.get_mobs(), self.maze)
         self.score = 0
         self.define_pacgum_pos(nb_pacgum)
         self.dead = False
@@ -31,9 +34,12 @@ class GameMode:
     def update_frame(self, config: Config):
         self.is_player_dead()
         for _ in range(4):
-            self.check_interaction(config)
-            self.player.update_pos()
-        self.ghosts.refresh_frame()
+            x, y = self.player.pos
+            self.check_interaction(config, (math.ceil(x), math.ceil(y)))
+            self.check_interaction(config, (math.floor(x), math.floor(y)))
+            self.player.update_pos(self.cheats.speed_mult)
+        if not self.cheats.ghost_freeze:
+            self.ghosts.refresh_frame()
 
     def get_direction(self, event: pygame.event.Event) -> None:
         if event.type != pygame.KEYDOWN:
@@ -72,8 +78,8 @@ class GameMode:
             i += 1
         self.pacgums_missing = i + 4
 
-    def check_interaction(self, config: Config):
-        x, y = self.player.pos
+    def check_interaction(self, config: Config, coordinates: tuple[int, int]):
+        x, y = coordinates
         direction = self.player.direction
         check = False
         if direction == 1 and y % 50 == 25:
@@ -112,7 +118,7 @@ class GameMode:
             ):
                 if ghost.state > 0:
                     ghost.state = 0
-                else:
+                elif not self.cheats.invincibility:
                     self.dead = True
 
     # def reset(self) -> None:

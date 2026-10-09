@@ -4,7 +4,6 @@ import time
 from src.visual.level_handler import LevelHandler
 from pathlib import Path
 from random import randint
-
 from src.menu import Menu
 from src.highscores import Highscores
 from src.parsing import Config
@@ -77,7 +76,7 @@ class Graphics:
         )
         self.cheats: Cheats = Cheats()
         self.game: LevelHandler = LevelHandler(
-            self.screen, self.assets, config
+            self.screen, self.assets, config, self.cheats
         )
         self.name_box: NameBox = NameBox(
             self.screen, self.assets, width, height

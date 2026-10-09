@@ -4,11 +4,10 @@ from src.visual.hud import Hud
 import pygame
 from enum import Enum
 from src.visual.game import GameMode
+from src.cheats import Cheats
 
 
-data = [
-    (15, 15) for _ in range(10)
-]
+data = [(15, 15) for _ in range(10)]
 data = data[::-1]
 
 
@@ -21,17 +20,22 @@ class VisualState(Enum):
 
 class LevelHandler:
     def __init__(
-        self, window: pygame.Surface, assets: Assets, config: Config
+        self,
+        window: pygame.Surface,
+        assets: Assets,
+        config: Config,
+        cheats: Cheats,
     ) -> None:
         self.window = window
         self.assets = assets
         self.config = config
+        self.cheats = cheats
         self.level = 0
         self.nb_pacgum = config.pacgum
         self.lives = config.lives
         self.time_left = float(config.level_max_time)
         self.mazes: list[GameMode] = [
-            GameMode(assets, size, config.pacgum) for size in data
+            GameMode(assets, size, config.pacgum, self.cheats) for size in data
         ]
         self.hud = Hud(window, assets)
         self.dead = False
@@ -45,6 +49,9 @@ class LevelHandler:
         if self.mazes[self.level].pacgums_missing == 0:
             self.level += 1
         game = self.mazes[self.level]
+        if self.cheats.one_pacgum and len(game.pacgums) > 1:
+            game.pacgums = {game.pacgums.pop()}
+            game.pacgums_missing = len(game.pacgums) + len(game.super_pacgum)
         _ = self.window.blit(game.maze.img, game.maze_pos)
         self.place_pacgum(game)
         if game.dead:
