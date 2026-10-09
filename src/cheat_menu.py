@@ -65,19 +65,27 @@ class CheatMenu:
             str, tuple[tuple[int, int, int, int], tuple[int, int, int, int]]
         ] = {}
         self._speed_i: int = self._index_of("speed")
+        self._mouse_nav: bool = True
+        self._last_mouse: tuple[int, int] = (-1, -1)
 
     def reset(self) -> None:
         self.selected = 0
         self._dragging_speed = False
+        self._mouse_nav = True
+        self._last_mouse = (-1, -1)
 
     def handle_keydown(self, event: pygame.event.Event) -> str | None:
         if event.key == pygame.K_UP:
+            self._mouse_nav = False
             self.selected = (self.selected - 1) % len(self.OPTIONS)
         elif event.key == pygame.K_DOWN:
+            self._mouse_nav = False
             self.selected = (self.selected + 1) % len(self.OPTIONS)
         elif event.key == pygame.K_LEFT:
+            self._mouse_nav = False
             self._nudge(-1)
         elif event.key == pygame.K_RIGHT:
+            self._mouse_nav = False
             self._nudge(1)
         elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
             return self._activate()
@@ -86,6 +94,8 @@ class CheatMenu:
         return None
 
     def click_at(self, mx: int, my: int) -> str | None:
+        self._mouse_nav = True
+        self._last_mouse = (mx, my)
         for kind, (left, right) in self._arrow_hits.items():
             if point_in(mx, my, *left):
                 self.selected = self._index_of(kind)
@@ -112,7 +122,10 @@ class CheatMenu:
     def mouse_up(self) -> None:
         self._dragging_speed = False
 
-    def mouse_move(self, mx: int, _: int) -> None:
+    def mouse_move(self, mx: int, my: int) -> None:
+        if (mx, my) != self._last_mouse:
+            self._last_mouse = (mx, my)
+            self._mouse_nav = True
         if self._dragging_speed:
             self._set_speed_from_x(mx)
 
@@ -175,6 +188,12 @@ class CheatMenu:
 
     def _update_hover(self) -> None:
         mx, my = pygame.mouse.get_pos()
+        moved = (mx, my) != self._last_mouse
+        self._last_mouse = (mx, my)
+        if moved:
+            self._mouse_nav = True
+        if not self._mouse_nav:
+            return
         for i, hit in enumerate(self._row_hits):
             if point_in(mx, my, *hit):
                 self.selected = i

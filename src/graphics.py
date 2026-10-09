@@ -100,11 +100,31 @@ class Graphics:
         )
         self.pause_bg: pygame.Surface | None = None
         self.last_score: int = 0
+        self._fps_frames: int = 0
+        self._fps_timer: float = 0.0
+        self._fps_display: int = 0
+        self._fps_label_w: int = 140
+
+    def _update_fps(self, dt: float) -> None:
+        self._fps_frames += 1
+        self._fps_timer += dt
+        if self._fps_timer >= 1.0:
+            self._fps_display = self._fps_frames
+            self._fps_frames = 0
+            self._fps_timer -= 1.0
+
+    def _draw_fps(self) -> None:
+        text = f"{self._fps_display} FPS"
+        surf = self.assets.font_medium.render(text, True, (180, 180, 190))
+        _ = self.screen.blit(
+            surf,
+            (self.width - self._fps_label_w - 12, 8),
+        )
 
     def run(self) -> None:
         background = make_background(self.width, self.height)
 
-        fps = 60
+        fps = self.config.fps
         frame_time = 1.0 / fps
         last = time.monotonic()
 
@@ -114,6 +134,7 @@ class Graphics:
             now = frame_start
             dt = now - last
             last = now
+            self._update_fps(dt)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -230,6 +251,7 @@ class Graphics:
             elif self.state == "game_over":
                 self.game_over.render(dt)
 
+            self._draw_fps()
             pygame.display.flip()
 
             elapsed = time.monotonic() - frame_start

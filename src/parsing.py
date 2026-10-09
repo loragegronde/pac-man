@@ -15,6 +15,7 @@ class Config(BaseModel):
     points_per_ghost: PositiveInt = Field(default=200)
     seed: Any = Field(default=None)
     level_max_time: PositiveInt = Field(default=90)
+    fps: PositiveInt = Field(default=60)
 
 
 def format_config_error(e: ValidationError) -> str:
