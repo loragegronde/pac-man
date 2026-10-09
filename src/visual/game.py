@@ -24,6 +24,7 @@ class GameMode:
         self.player = Player(self.maze, self.assets.get_mobs())
         self.ghosts = EnemyHandler(self.assets.get_mobs(), self.maze)
         self.score = 0
+        self.dt: float = 0.0
         self.define_pacgum_pos(nb_pacgum)
         self.dead = False
 
@@ -31,8 +32,11 @@ class GameMode:
         x, y = size
         self.maze_pos = (950 - ((x // 2) * 50), 600 - ((y // 2) * 50))
 
-    def update_frame(self, config: Config):
+    def update_frame(self, config: Config, dt: float = 0.0):
         self.is_player_dead()
+        self.dt += dt
+        if self.dt < 1 / 60:
+            return
         for _ in range(4):
             x, y = self.player.pos
             self.check_interaction(config, (math.ceil(x), math.ceil(y)))

@@ -225,7 +225,12 @@ class Graphics:
             if self.state == "menu":
                 self.menu.render(dt)
             elif self.state == "playing":
-                self.game.refresh_frame(dt)
+                if self.game.lives == 0:
+                    self.state = "game_over"
+                if self.game.level > 9:
+                    self.state = "victory"
+                else:
+                    self.game.refresh_frame(dt)
                 self.last_score = self.game.score
             elif self.state == "pause":
                 if self.pause_bg is None:
