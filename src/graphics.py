@@ -1,7 +1,7 @@
 import os
 import pygame
 import time
-from src.visual.game import GameMode
+from src.visual.level_handler import LevelHandler
 from pathlib import Path
 from random import randint
 
@@ -76,7 +76,9 @@ class Graphics:
             self.screen, width, height, self.highscores, self.assets
         )
         self.cheats: Cheats = Cheats()
-        self.game: GameMode = GameMode(self.screen, self.assets, config)
+        self.game: LevelHandler = LevelHandler(
+            self.screen, self.assets, config
+        )
         self.name_box: NameBox = NameBox(
             self.screen, self.assets, width, height
         )
@@ -124,12 +126,12 @@ class Graphics:
                         elif event.key == pygame.K_DOWN:
                             self.menu.scroll_by(1)
                         elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
-                            self.game.reset()
+                            # self.game.reset()
                             self.state = "playing"
                         elif event.key == pygame.K_ESCAPE:
                             self.running = False
                     elif self.state == "playing":
-                        self.game.get_direction(event)
+                        self.game.mazes[self.game.level].get_direction(event)
                         if event.key == pygame.K_ESCAPE:
                             self.pause.reset()
                             self.pause_bg = None
@@ -172,7 +174,7 @@ class Graphics:
                     if self.state == "menu":
                         clicked = self.menu.click_at(*event.pos)
                         if clicked == "playing":
-                            self.game.reset()
+                            # self.game.reset()
                             self.state = "playing"
                     elif self.state == "pause":
                         action = self.pause.click_at(*event.pos)

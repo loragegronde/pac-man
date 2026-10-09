@@ -20,8 +20,7 @@ class EnemyHandler:
             Pinky(assets.pinky, assets.afraid, maze),
         ]
 
-    def refresh_frame(self, dt: float = 0.0, update: bool = True):
+    def refresh_frame(self):
         for i, ghost in enumerate(self.ghosts):
-            for i in range(2):
-                if update:
-                    ghost.update_pos()
+            for _ in range(2):
+                ghost.update_pos()

@@ -5,7 +5,7 @@ import pygame
 from src.assets import Assets
 from src.cheats import Cheats
 from src.menu import draw_double_round_rect, point_in
-from src.visual.game import GameMode
+from src.visual.level_handler import LevelHandler
 
 
 class CheatMenu:
@@ -49,12 +49,12 @@ class CheatMenu:
         screen_w: int,
         screen_h: int,
         cheats: Cheats,
-        game: GameMode,
+        game: LevelHandler,
     ) -> None:
         self.screen: pygame.Surface = screen
         self.assets: Assets = assets
         self.cheats: Cheats = cheats
-        self.game: GameMode = game
+        self.game: LevelHandler = game
         self.selected: int = 0
         self.x: int = (screen_w - self.BOX_W) // 2
         self.y: int = (screen_h - self.BOX_H) // 2 - 20
