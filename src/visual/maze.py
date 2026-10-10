@@ -1,10 +1,17 @@
 from unpacked_mazegenerator.mazegenerator import MazeGenerator
 import pygame
 
+type Point = tuple[int, int]
+type Color = tuple[int, int, int]
+type CornerTriple = tuple[Point, Point, Point]
+type SideCorners = tuple[CornerTriple, CornerTriple]
+type WallAngles = tuple[SideCorners, SideCorners]
+type AngleEntry = tuple[int, int, Point, Point, WallAngles]
+
 
 class Maze:
-    BLUE = (66, 147, 245)
-    ANGLES = {
+    BLUE: Color = (66, 147, 245)
+    ANGLES: dict[int, WallAngles] = {
         8: (
             (((1, -1), (1, -2), (2, -3)), ((-1, -1), (-1, -2), (-2, -3))),
             (((1, 1), (1, 2), (2, 3)), ((-1, 1), (-1, 2), (-2, 3))),
@@ -22,29 +29,27 @@ class Maze:
             (((-1, 1), (-2, 1), (-3, 2)), ((-1, -1), (-2, -1), (-3, -2))),
         ),
     }
-    # format:
-    # left/ right angles
-    # interior/exterior
 
-    def __init__(self, size: tuple[int, int]) -> None:
-        self.maze = MazeGenerator(size).maze
-        self.forty_two = {
+    def __init__(self, size: Point) -> None:
+        self.maze: list[list[int]] = MazeGenerator(size).maze
+        self.forty_two: set[Point] = {
             (i, j)
             for i in range(len(self.maze[0]))
             for j in range(len(self.maze))
             if self.maze[j][i] == 15
         }
+        self.img: pygame.Surface = pygame.Surface((1, 1))
         self.define_angles()
 
     def define_angles(self) -> None:
-        self.angles: dict[int, tuple] = {
+        self.angles: dict[int, AngleEntry] = {
             8: (1, 4, (0, -1), (0, 1), self.ANGLES[8]),
             4: (8, 2, (-1, 0), (1, 0), self.ANGLES[4]),
             2: (4, 1, (0, 1), (0, -1), self.ANGLES[2]),
             1: (2, 8, (1, 0), (-1, 0), self.ANGLES[1]),
         }
 
-    def modify_42(self, i: int, j: int):
+    def modify_42(self, i: int, j: int) -> None:
         wall = 15
         if (i - 1, j) in self.forty_two:
             wall -= 8
@@ -56,7 +61,7 @@ class Maze:
             wall -= 1
         self.maze[j][i] = wall
 
-    def create_maze(self, img: pygame.Surface):
+    def create_maze(self, img: pygame.Surface) -> None:
         self.img = img
         for cell in self.forty_two:
             self.modify_42(*cell)
@@ -67,7 +72,7 @@ class Maze:
             i, j = cell
             self.maze[j][i] = 15
 
-    def draw_cell(self, wall: int, coordinates: tuple[int, int]):
+    def draw_cell(self, wall: int, coordinates: Point) -> None:
         x, y = coordinates
         cell = wall
         if wall & 8:
@@ -166,10 +171,10 @@ class Maze:
         self,
         wall: int,
         side: int,
-        coord_side: tuple[int, int],
-        pixels,
-        coordinates: tuple[int, int],
-        cell_coord: tuple[int, int],
+        coord_side: Point,
+        pixels: SideCorners,
+        coordinates: Point,
+        cell_coord: Point,
         cell: int,
     ) -> int:
         x, y = coordinates

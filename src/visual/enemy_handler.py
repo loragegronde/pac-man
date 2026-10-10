@@ -1,26 +1,27 @@
+from src.assets import Mob
 from src.visual.blinky import Blinky
 from src.visual.clyde import Clyde
-from src.visual.inky import Inky
-from src.visual.pinky import Pinky
-from src.assets import Mob
 from src.visual.enemy import Enemy
+from src.visual.inky import Inky
+from src.visual.maze import Maze
+from src.visual.pinky import Pinky
 
 
 class EnemyHandler:
-    def __init__(self, assets: Mob, maze) -> None:
-        self.create_ghosts(assets, maze)
-        self.dt: float = 0
-        self.frame = 0
-
-    def create_ghosts(self, assets: Mob, maze):
+    def __init__(self, assets: Mob, maze: Maze) -> None:
+        afraid, dead = assets.afraid, assets.dead
         self.ghosts: list[Enemy] = [
-            Blinky(assets.blinky, assets.afraid, maze),
-            Clyde(assets.clyde, assets.afraid, maze),
-            Inky(assets.inky, assets.afraid, maze),
-            Pinky(assets.pinky, assets.afraid, maze),
+            Blinky(assets.blinky, afraid, dead, maze),
+            Clyde(assets.clyde, afraid, dead, maze),
+            Inky(assets.inky, afraid, dead, maze),
+            Pinky(assets.pinky, afraid, dead, maze),
         ]
 
-    def refresh_frame(self):
-        for i, ghost in enumerate(self.ghosts):
-            for _ in range(2):
+    def refresh_frame(self, target: tuple[int, int], pac_dir: int) -> None:
+        for ghost in self.ghosts:
+            if ghost.dead:
+                ghost.go_home()
+                continue
+            ghost.update_direction(target, pac_dir)
+            for _ in range(1 if ghost.state > 0 else 2):
                 ghost.update_pos()

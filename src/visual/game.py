@@ -17,23 +17,26 @@ class GameMode:
         cheats: Cheats,
     ) -> None:
         self.define_maze_pos(size)
-        self.assets = assets
-        self.cheats = cheats
-        self.maze = Maze(size)
+        self.assets: Assets = assets
+        self.cheats: Cheats = cheats
+        self.maze: Maze = Maze(size)
         self.maze.create_maze(pygame.Surface((size[0] * 50, size[1] * 50)))
         self.player = Player(self.maze, self.assets.get_mobs())
         self.ghosts = EnemyHandler(self.assets.get_mobs(), self.maze)
         self.score = 0
         self.dt: float = 0.0
         self.define_pacgum_pos(nb_pacgum)
-        self.dead = False
+        self.dead: bool = False
 
     def define_maze_pos(self, size: tuple[int, int]):
         x, y = size
-        self.maze_pos = (950 - ((x // 2) * 50), 600 - ((y // 2) * 50))
+        self.maze_pos: tuple[int, int] = (
+            950 - ((x // 2) * 50),
+            600 - ((y // 2) * 50),
+        )
 
     def update_frame(self, config: Config, dt: float = 0.0):
-        self.is_player_dead()
+        self.is_player_dead(config)
         self.dt += dt
         if self.dt < 1 / 60:
             return
@@ -43,7 +46,9 @@ class GameMode:
             self.check_interaction(config, (math.floor(x), math.floor(y)))
             self.player.update_pos(self.cheats.speed_mult)
         if not self.cheats.ghost_freeze:
-            self.ghosts.refresh_frame()
+            self.ghosts.refresh_frame(
+                self.player.maze_pos, self.player.direction
+            )
 
     def get_direction(self, event: pygame.event.Event) -> None:
         if event.type != pygame.KEYDOWN:
@@ -66,7 +71,7 @@ class GameMode:
             for x in range(max_x)
             if self.maze.maze[y][x] != 15
         }
-        self.super_pacgum = {
+        self.super_pacgum: set[tuple[int, int]] = {
             (0, 0),
             (max_x - 1, 0),
             (max_x - 1, max_y - 1),
@@ -75,12 +80,12 @@ class GameMode:
         available = available.difference(
             self.super_pacgum, {(max_x // 2, max_y // 2)}
         )
-        self.pacgums = set()
+        self.pacgums: set[tuple[int, int]] = set()
         i = 0
         while i < nb_pacgum and available:
             self.pacgums.add(available.pop())
             i += 1
-        self.pacgums_missing = i + 4
+        self.pacgums_missing: int = i + 4
 
     def check_interaction(self, config: Config, coordinates: tuple[int, int]):
         x, y = coordinates
@@ -106,13 +111,17 @@ class GameMode:
                 self.super_pacgum.remove(maze_pos)
                 self.pacgums_missing -= 1
                 self.score += config.points_per_super_pacgum
-                for i in range(len(self.ghosts.ghosts)):
-                    self.ghosts.ghosts[i].state = 5
+                self.ghost_combo = 0
+                for ghost in self.ghosts.ghosts:
+                    if not ghost.dead:
+                        ghost.state = 5
 
-    def is_player_dead(self):
+    def is_player_dead(self, config: Config) -> None:
         min_x, min_y = self.player.pos
         max_x, max_y = min_x + 35, min_y + 35
         for ghost in self.ghosts.ghosts:
+            if ghost.dead:
+                continue
             ghost_min_x, ghost_min_y = ghost.pos
             ghost_max_x, ghost_max_y = ghost_min_x + 35, ghost_min_y + 35
             if (
@@ -121,36 +130,14 @@ class GameMode:
                 min_x <= ghost_max_x <= max_x and min_y <= ghost_max_y <= max_y
             ):
                 if ghost.state > 0:
-                    ghost.state = 0
-                elif not self.cheats.invincibility:
+                    self.score += config.points_per_ghost << self.ghost_combo
+                    self.ghost_combo += 1
+                    ghost.dead = True
+                    ghost.state = 0.0
+                    ghost.dead_wait = 0
+                    mx, my = ghost.maze_pos
+                    ghost.pos = (mx * 50 + 7, my * 50 + 7)
+                    self.eat_freeze = 1.0
+                    return
+                if not self.cheats.invincibility:
                     self.dead = True
-
-    # def reset(self) -> None:
-    #     self.score = 0
-    #     self.lives = self.config.lives
-    #     self.level = 1
-    #     self.time_left = float(self.config.level_max_time)
-    #     self.nb_pacgum = self.config.pacgum
-    #     self.define_pacgum_pos()
-    #     self.dead = False
-    #     self.dt = 0.0
-    #     self.frame = -1
-    #     self.hud.reset()
-    #     self.player.define_start_pos()
-    #     for ghost in self.ghosts.ghosts:
-    #         ghost.define_pos()
-
-    # def draw_border(self):
-    #     img_x, img_y = self.maze_pos
-    #     for x in range(756):
-    #         self.window.set_at((x + img_x - 3, 0 + img_y - 3),
-    #         self.maze.BLUE)
-    #         self.window.set_at(
-    #             (x + img_x - 3, 755 + img_y - 3), self.maze.BLUE
-    #         )
-    #     for y in range(756):
-    #         self.window.set_at((0 + img_x - 3, y + img_y - 3),
-    #         self.maze.BLUE)
-    #         self.window.set_at(
-    #             (755 + img_x - 3, y + img_y - 3), self.maze.BLUE
-    #         )

@@ -28,8 +28,8 @@ class CheatMenu:
     CHECK_SIZE: int = 28
     SPEED_MIN: float = 0.5
     SPEED_MAX: float = 3.0
-    LEVEL_MIN: int = 1
-    LEVEL_MAX: int = 10
+    LEVEL_MIN: int = 0
+    LEVEL_MAX: int = 9
     INT_LABEL_W: int = 208
     ARROW_W: int = 40
     CHAR_W: int = 26
@@ -239,7 +239,7 @@ class CheatMenu:
             elif kind == "lives":
                 self._draw_int_row(kind, label, self.game.lives, y, color)
             elif kind == "level":
-                self._draw_int_row(kind, label, self.game.level, y, color)
+                self._draw_int_row(kind, label, self.game.level + 1, y, color)
             elif kind == "speed":
                 self._draw_speed(y, i == self.selected)
             else:

@@ -146,7 +146,7 @@ class Graphics:
                         elif event.key == pygame.K_DOWN:
                             self.menu.scroll_by(1)
                         elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
-                            # self.game.reset()
+                            self.game.reset()
                             self.state = "playing"
                         elif event.key == pygame.K_ESCAPE:
                             self.running = False
@@ -157,10 +157,14 @@ class Graphics:
                             self.pause_bg = None
                             self.state = "pause"
                         elif event.key == pygame.K_v:
+                            self.last_score = self.game.score
                             self.name_box.reset()
+                            self.game.reset()
                             self.state = "victory"
                         elif event.key == pygame.K_o:
+                            self.last_score = self.game.score
                             self.name_box.reset()
+                            self.game.reset()
                             self.state = "game_over"
                     elif self.state == "pause":
                         action = self.pause.handle_keydown(event)
@@ -194,7 +198,7 @@ class Graphics:
                     if self.state == "menu":
                         clicked = self.menu.click_at(*event.pos)
                         if clicked == "playing":
-                            # self.game.reset()
+                            self.game.reset()
                             self.state = "playing"
                     elif self.state == "pause":
                         action = self.pause.click_at(*event.pos)
@@ -232,6 +236,14 @@ class Graphics:
                 else:
                     self.game.refresh_frame(dt)
                 self.last_score = self.game.score
+                if self.game.lives == 0:
+                    self.name_box.reset()
+                    self.game.reset()
+                    self.state = "game_over"
+                elif self.game.level > 9:
+                    self.name_box.reset()
+                    self.game.reset()
+                    self.state = "victory"
             elif self.state == "pause":
                 if self.pause_bg is None:
                     self.game.refresh_frame(0.0)
