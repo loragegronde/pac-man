@@ -21,10 +21,12 @@ class GameMode:
         self.cheats: Cheats = cheats
         self.maze: Maze = Maze(size)
         self.maze.create_maze(pygame.Surface((size[0] * 50, size[1] * 50)))
-        self.player = Player(self.maze, self.assets.get_mobs())
-        self.ghosts = EnemyHandler(self.assets.get_mobs(), self.maze)
-        self.score = 0
+        self.player: Player = Player(self.maze, self.assets.get_mobs())
+        self.ghosts: EnemyHandler = EnemyHandler(self.assets.get_mobs(), self.maze)
+        self.score: int = 0
         self.dt: float = 0.0
+        self.ghost_combo: int = 0
+        self.eat_freeze: float = 0.0
         self.define_pacgum_pos(nb_pacgum)
         self.dead: bool = False
 
@@ -36,6 +38,9 @@ class GameMode:
         )
 
     def update_frame(self, config: Config, dt: float = 0.0):
+        if self.eat_freeze > 0:
+            self.eat_freeze = max(0.0, self.eat_freeze - dt)
+            return
         self.is_player_dead(config)
         self.dt += dt
         if self.dt < 1 / 60:
@@ -137,7 +142,7 @@ class GameMode:
                     ghost.dead_wait = 0
                     mx, my = ghost.maze_pos
                     ghost.pos = (mx * 50 + 7, my * 50 + 7)
-                    self.eat_freeze = 1.0
+                    self.eat_freeze = 0.7
                     return
                 if not self.cheats.invincibility:
                     self.dead = True
