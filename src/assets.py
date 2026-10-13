@@ -264,7 +264,7 @@ class Assets:
             pac=pac,
             pac_man_spawn=pac_man_spawn,
             afraid=afraid,
-            dead=dead
+            dead=dead,
         )
 
     def menu_layout(self, screen_w: int, screen_h: int) -> MenuLayout:

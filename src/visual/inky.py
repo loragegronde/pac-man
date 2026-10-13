@@ -19,9 +19,7 @@ class Inky(Enemy):
         self.dead_wait = 0
 
     @override
-    def update_direction(
-        self, target: tuple[int, int], pac_dir: int
-    ) -> None:
+    def update_direction(self, target: tuple[int, int], pac_dir: int) -> None:
         _ = target, pac_dir
         x, y = self.pos
         if x % 50 != 7 or y % 50 != 7:

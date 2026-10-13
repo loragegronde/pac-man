@@ -29,9 +29,14 @@ class Maze:
             (((-1, 1), (-2, 1), (-3, 2)), ((-1, -1), (-2, -1), (-3, -2))),
         ),
     }
+    WALL_SIZE = 50
+    ANGLE_SIZE = 3
 
-    def __init__(self, size: Point) -> None:
-        self.maze: list[list[int]] = MazeGenerator(size).maze
+    def __init__(self, size: Point, seed: int | None) -> None:
+        if seed:
+            self.maze: list[list[int]] = MazeGenerator(size, seed=seed).maze
+        else:
+            self.maze: list[list[int]] = MazeGenerator(size).maze
         self.forty_two: set[Point] = {
             (i, j)
             for i in range(len(self.maze[0]))
@@ -83,7 +88,10 @@ class Maze:
                 left,
                 coord_l,
                 pixels[0],
-                (x * 50 + 3, y * 50 + 3),
+                (
+                    x * self.WALL_SIZE + self.ANGLE_SIZE,
+                    y * self.WALL_SIZE + self.ANGLE_SIZE,
+                ),
                 (x, y),
                 cell,
             )
@@ -92,12 +100,21 @@ class Maze:
                 right,
                 coord_r,
                 pixels[1],
-                (x * 50 + 3, y * 50 + 47),
+                (
+                    x * self.WALL_SIZE + self.ANGLE_SIZE,
+                    y * self.WALL_SIZE + self.WALL_SIZE - self.ANGLE_SIZE,
+                ),
                 (x, y),
                 cell,
             )
             for i in range(3 - first, 48 + second):
-                self.img.set_at((x * 50 + 3, y * 50 + i), self.BLUE)
+                self.img.set_at(
+                    (
+                        x * self.WALL_SIZE + self.ANGLE_SIZE,
+                        y * self.WALL_SIZE + i,
+                    ),
+                    self.BLUE,
+                )
         if wall & 4:
             wall -= 4
             left, right, coord_l, coord_r, pixels = self.angles[4]
@@ -106,7 +123,10 @@ class Maze:
                 left,
                 coord_l,
                 pixels[0],
-                (x * 50 + 3, y * 50 + 47),
+                (
+                    x * self.WALL_SIZE + self.ANGLE_SIZE,
+                    y * self.WALL_SIZE + self.WALL_SIZE - self.ANGLE_SIZE,
+                ),
                 (x, y),
                 cell,
             )
@@ -115,12 +135,21 @@ class Maze:
                 right,
                 coord_r,
                 pixels[1],
-                (x * 50 + 47, y * 50 + 47),
+                (
+                    x * self.WALL_SIZE + self.WALL_SIZE - self.ANGLE_SIZE,
+                    y * self.WALL_SIZE + self.WALL_SIZE - self.ANGLE_SIZE,
+                ),
                 (x, y),
                 cell,
             )
             for i in range(3 - first, 48 + second):
-                self.img.set_at((x * 50 + i, y * 50 + 47), self.BLUE)
+                self.img.set_at(
+                    (
+                        x * self.WALL_SIZE + i,
+                        y * self.WALL_SIZE + self.WALL_SIZE - self.ANGLE_SIZE,
+                    ),
+                    self.BLUE,
+                )
         if wall & 2:
             wall -= 2
             left, right, coord_l, coord_r, pixels = self.angles[2]
@@ -129,7 +158,10 @@ class Maze:
                 left,
                 coord_l,
                 pixels[0],
-                (x * 50 + 47, y * 50 + 47),
+                (
+                    x * self.WALL_SIZE + self.WALL_SIZE - self.ANGLE_SIZE,
+                    y * self.WALL_SIZE + self.WALL_SIZE - self.ANGLE_SIZE,
+                ),
                 (x, y),
                 cell,
             )
@@ -138,12 +170,21 @@ class Maze:
                 right,
                 coord_r,
                 pixels[1],
-                (x * 50 + 47, y * 50 + 3),
+                (
+                    x * self.WALL_SIZE + self.WALL_SIZE - self.ANGLE_SIZE,
+                    y * self.WALL_SIZE + self.ANGLE_SIZE,
+                ),
                 (x, y),
                 cell,
             )
             for i in range(3 - second, 48 + first):
-                self.img.set_at((x * 50 + 47, y * 50 + i), self.BLUE)
+                self.img.set_at(
+                    (
+                        x * self.WALL_SIZE + self.WALL_SIZE - self.ANGLE_SIZE,
+                        y * self.WALL_SIZE + i,
+                    ),
+                    self.BLUE,
+                )
         if wall & 1:
             left, right, coord_l, coord_r, pixels = self.angles[1]
             first = self.draw_angles(
@@ -151,7 +192,10 @@ class Maze:
                 left,
                 coord_l,
                 pixels[0],
-                (x * 50 + 47, y * 50 + 3),
+                (
+                    x * self.WALL_SIZE + self.WALL_SIZE - self.ANGLE_SIZE,
+                    y * self.WALL_SIZE + self.ANGLE_SIZE,
+                ),
                 (x, y),
                 cell,
             )
@@ -160,12 +204,21 @@ class Maze:
                 right,
                 coord_r,
                 pixels[1],
-                (x * 50 + 3, y * 50 + 3),
+                (
+                    x * self.WALL_SIZE + self.ANGLE_SIZE,
+                    y * self.WALL_SIZE + self.ANGLE_SIZE,
+                ),
                 (x, y),
                 cell,
             )
             for i in range(3 - second, 48 + first):
-                self.img.set_at((x * 50 + i, y * 50 + 3), self.BLUE)
+                self.img.set_at(
+                    (
+                        x * self.WALL_SIZE + i,
+                        y * self.WALL_SIZE + self.ANGLE_SIZE,
+                    ),
+                    self.BLUE,
+                )
 
     def draw_angles(
         self,
@@ -184,11 +237,11 @@ class Maze:
             for corner_x, corner_y in pixels[0]:
                 new_x, new_y = x + corner_x - v_x * 3, y + corner_y - v_y * 3
                 self.img.set_at((new_x, new_y), self.BLUE)
-            return -3
+            return -self.ANGLE_SIZE
         elif not (0 <= side_y <= 15 and 0 <= side_x <= 15):
-            return 3
+            return self.ANGLE_SIZE
         elif self.maze[side_y][side_x] & wall:
-            return 3
+            return self.ANGLE_SIZE
         else:
             for corner_x, corner_y in pixels[1]:
                 new_x, new_y = x + corner_x, y + corner_y

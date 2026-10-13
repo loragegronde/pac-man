@@ -5,9 +5,26 @@ import pygame
 from enum import Enum
 from src.visual.game import GameMode
 from src.cheats import Cheats
+from dataclasses import dataclass
 
-data = [(15, 15) for _ in range(10)]
-data = data[::-1]
+
+@dataclass
+class GameData:
+    assets: Assets
+    size = (15, 15)
+    nb_pacgums: int
+    cheats: Cheats
+    ghost_speed = [speed / 100 for speed in range(75, 125, 5)]
+
+    def get_data(self, i: int):
+        return [
+            self.assets,
+            self.size,
+            self.nb_pacgums,
+            self.cheats,
+            self.ghost_speed[i],
+            1 if not i else None,
+        ]
 
 
 class VisualState(Enum):
@@ -33,8 +50,11 @@ class LevelHandler:
         self.nb_pacgum: int = config.pacgum
         self.lives: int = config.lives
         self.time_left: float = float(config.level_max_time)
+        data = GameData(
+            assets=assets, nb_pacgums=self.nb_pacgum, cheats=cheats
+        )
         self.mazes: list[GameMode] = [
-            GameMode(assets, size, config.pacgum, self.cheats) for size in data
+            GameMode(*data.get_data(i)) for i in range(10)
         ]
         self.hud: Hud = Hud(window, assets)
         self.dead: bool = False
@@ -43,16 +63,13 @@ class LevelHandler:
         self.frame: int = 0
         self.state: VisualState = VisualState.START
         self.score: int = 0
+        self.speed = 60 / self.config.fps
 
     def reset(self) -> None:
         self.level = 0
         self.nb_pacgum = self.config.pacgum
         self.lives = self.config.lives
         self.time_left = float(self.config.level_max_time)
-        self.mazes = [
-            GameMode(self.assets, size, self.config.pacgum, self.cheats)
-            for size in data
-        ]
         self.dead = False
         self.dt = 0.0
         self.dead_frame = -1
@@ -62,6 +79,10 @@ class LevelHandler:
         self.hud.reset()
 
     def refresh_frame(self, dt: float) -> None:
+        self.dt += dt
+        if self.cheats.always_chase:
+            for ghost in self.mazes[self.level].ghosts.ghosts:
+                ghost.state = 5
         if self.mazes[self.level].pacgums_missing == 0:
             self.level += 1
             self.time_left = float(self.config.level_max_time)
@@ -73,30 +94,31 @@ class LevelHandler:
             game.pacgums_missing = len(game.pacgums) + len(game.super_pacgum)
         _ = self.window.blit(game.maze.img, game.maze_pos)
         self.place_pacgum(game)
+        self.score = sum(m.score for m in self.mazes)
         if game.dead:
             self.death_animation(dt)
-            self.score = sum(m.score for m in self.mazes)
             self.hud.render(
                 self.score, self.lives, self.level, self.time_left, dt
             )
             return
-        game.update_frame(self.config, dt)
+        game.update_frame(self.config, dt, self.speed)
         self.time_left = self.time_left - dt
         self.draw_ghosts(dt)
         self.draw_player()
         self.hud.render(self.score, self.lives, self.level, self.time_left, dt)
-        self.frame = self.frame + 1 % self.config.fps
+        if self.dt > 0.14:
+            self.frame += 1
+            self.dt -= 0.14
 
     def death_animation(self, dt: float = 0.0):
         dead_anim = self.assets.get_mobs().pac_man_spawn
-        self.dt += dt
         if self.dead_frame == -1:
             time = 1
         else:
             time = 0.1
         if self.dt > time:
             self.dead_frame += 1
-            self.dt -= time
+            self.dt = 0
         if self.dead_frame == len(dead_anim):
             self.mazes[self.level].dead = False
             self.dead_frame = -1
@@ -122,13 +144,19 @@ class LevelHandler:
             x, y = pacgum
             _ = self.window.blit(
                 self.assets.pac_gum,
-                (x * 50 + 22 + maze_x, y * 50 + 22 + maze_y),
+                (
+                    x * self.mazes[0].maze.WALL_SIZE + 22 + maze_x,
+                    y * self.mazes[0].maze.WALL_SIZE + 22 + maze_y,
+                ),
             )
         for super_pacgum in game.super_pacgum:
             x, y = super_pacgum
             _ = self.window.blit(
                 self.assets.super_pacgum,
-                (x * 50 + 16 + maze_x, y * 50 + 16 + maze_y),
+                (
+                    x * self.mazes[0].maze.WALL_SIZE + 16 + maze_x,
+                    y * self.mazes[0].maze.WALL_SIZE + 16 + maze_y,
+                ),
             )
 
     def draw_player(self):
@@ -141,7 +169,7 @@ class LevelHandler:
 
         p_x, p_y = game.player.pos
         _ = self.window.blit(
-            game.player.movement[game.player.direction][self.frame // 5 % 3],
+            game.player.movement[game.player.direction][self.frame % 3],
             (p_x + img_x, p_y + img_y),
         )
 
@@ -158,9 +186,9 @@ class LevelHandler:
                     if ghost.state < 2 and 0 <= ghost.state % 0.4 < 0.2
                     else "normal"
                 )
-                asset = ghost.afraid[state][self.frame // 5 % 2]
+                asset = ghost.afraid[state][self.frame % 2]
                 ghost.state = max(0.0, ghost.state - dt)
             else:
-                asset = ghost.assets[ghost.direction][self.frame // 5 % 2]
+                asset = ghost.assets[ghost.direction][self.frame % 2]
             x, y = ghost.pos
             _ = self.window.blit(asset, (x + img_x, y + img_y))

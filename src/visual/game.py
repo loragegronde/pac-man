@@ -5,7 +5,6 @@ from src.visual.player import Player
 from src.visual.enemy_handler import EnemyHandler
 from src.cheats import Cheats
 import pygame
-import math
 
 
 class GameMode:
@@ -15,20 +14,24 @@ class GameMode:
         size: tuple[int, int],
         nb_pacgum: int,
         cheats: Cheats,
+        speed: float,
+        seed: int | None = None,
     ) -> None:
         self.define_maze_pos(size)
         self.assets: Assets = assets
         self.cheats: Cheats = cheats
-        self.maze: Maze = Maze(size)
+        self.maze: Maze = Maze(size, seed)
         self.maze.create_maze(pygame.Surface((size[0] * 50, size[1] * 50)))
         self.player: Player = Player(self.maze, self.assets.get_mobs())
-        self.ghosts: EnemyHandler = EnemyHandler(self.assets.get_mobs(), self.maze)
+        self.ghosts: EnemyHandler = EnemyHandler(
+            self.assets.get_mobs(), self.maze, speed
+        )
         self.score: int = 0
-        self.dt: float = 0.0
         self.ghost_combo: int = 0
         self.eat_freeze: float = 0.0
         self.define_pacgum_pos(nb_pacgum)
         self.dead: bool = False
+        self.prev = self.player.pos
 
     def define_maze_pos(self, size: tuple[int, int]):
         x, y = size
@@ -37,22 +40,20 @@ class GameMode:
             600 - ((y // 2) * 50),
         )
 
-    def update_frame(self, config: Config, dt: float = 0.0):
+    def update_frame(
+        self, config: Config, dt: float = 0.0, speed: float = 1.0
+    ) -> None:
         if self.eat_freeze > 0:
             self.eat_freeze = max(0.0, self.eat_freeze - dt)
             return
         self.is_player_dead(config)
-        self.dt += dt
-        if self.dt < 1 / 60:
-            return
-        for _ in range(4):
-            x, y = self.player.pos
-            self.check_interaction(config, (math.ceil(x), math.ceil(y)))
-            self.check_interaction(config, (math.floor(x), math.floor(y)))
-            self.player.update_pos(self.cheats.speed_mult)
+        for _ in range(3):
+            self.check_interaction(config)
+            self.prev = self.player.pos
+            self.player.update_pos(self.cheats.speed_mult * speed)
         if not self.cheats.ghost_freeze:
             self.ghosts.refresh_frame(
-                self.player.maze_pos, self.player.direction
+                self.player.maze_pos, self.player.direction, speed
             )
 
     def get_direction(self, event: pygame.event.Event) -> None:
@@ -92,22 +93,25 @@ class GameMode:
             i += 1
         self.pacgums_missing: int = i + 4
 
-    def check_interaction(self, config: Config, coordinates: tuple[int, int]):
-        x, y = coordinates
+    def check_interaction(self, config: Config):
+        x, y = self.player.pos
+        px, py = self.prev
+        max_x, min_x = max(x, px), min(x, px)
+        max_y, min_y = max(y, py), min(y, py)
         direction = self.player.direction
         check = False
-        if direction == 1 and y % 50 == 25:
+        if direction == 1 and min_y % 50 <= 25 <= max_y % 50:
             check = True
-        if direction == 2 and (x + 35) % 50 == 25:
+        if direction == 2 and (min_x + 35) % 50 <= 25 <= (max_x + 35) % 50:
             check = True
             x += 35
-        if direction == 4 and (y + 35) % 50 == 25:
+        if direction == 4 and (min_y + 35) % 50 <= 25 <= (max_y + 35) % 50:
             check = True
             y += 35
-        if direction == 8 and x % 50 == 25:
+        if direction == 8 and min_x % 50 <= 25 <= max_x % 50:
             check = True
         if check:
-            maze_pos = (x // 50, y // 50)
+            maze_pos = (int(x) // 50, int(y) // 50)
             if maze_pos in self.pacgums:
                 self.pacgums.remove(maze_pos)
                 self.pacgums_missing -= 1

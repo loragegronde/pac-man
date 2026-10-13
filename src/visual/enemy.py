@@ -13,7 +13,7 @@ type DeadSprites = dict[int, pygame.Surface]
 class Enemy(ABC):
     maze_pos: tuple[int, int]
     home: tuple[int, int]
-    pos: tuple[int, int]
+    pos: tuple[int | float, int | float]
 
     def __init__(
         self,
@@ -21,6 +21,7 @@ class Enemy(ABC):
         afraid: AfraidSprites,
         dead: DeadSprites,
         maze: Maze,
+        speed: float
     ) -> None:
         self.direction: int = 1
         self.state: float = 0.0
@@ -37,8 +38,9 @@ class Enemy(ABC):
             1: (0, -1),
         }
         self.define_pos()
+        self.speed = speed
 
-    def update_pos(self) -> None:
+    def update_pos(self, speed: float = 1.0) -> None:
         mx, my = self.maze_pos
         x, y = self.pos
         if not self.maze.maze[my][mx] & self.direction or (
@@ -47,9 +49,11 @@ class Enemy(ABC):
             dx, dy = self.vector[self.direction]
         else:
             dx, dy = 0, 0
+        dx *= speed
+        dy *= speed
         nx, ny = x + dx, y + dy
         if nx % 50 == 7 and ny % 50 == 7:
-            self.maze_pos = (nx // 50, ny // 50)
+            self.maze_pos = (int(nx) // 50, int(ny) // 50)
         self.pos = (nx, ny)
 
     def go_home(self) -> None:

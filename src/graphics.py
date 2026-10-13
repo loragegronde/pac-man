@@ -229,7 +229,7 @@ class Graphics:
             if self.state == "menu":
                 self.menu.render(dt)
             elif self.state == "playing":
-                if self.game.lives == 0:
+                if self.game.lives == 0 or self.game.time_left <= 0:
                     self.state = "game_over"
                 if self.game.level > 9:
                     self.state = "victory"

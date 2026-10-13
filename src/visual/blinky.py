@@ -17,14 +17,14 @@ class Blinky(Enemy):
         self.dead_wait = 0
 
     @override
-    def update_direction(
-        self, target: tuple[int, int], pac_dir: int
-    ) -> None:
+    def update_direction(self, target: tuple[int, int], pac_dir: int) -> None:
         _ = pac_dir
         x, y = self.pos
         if x % 50 != 7 or y % 50 != 7:
             return
-        goal = farthest_cell(self.maze.maze, target) if self.state > 0 else target
+        goal = (
+            farthest_cell(self.maze.maze, target) if self.state > 0 else target
+        )
         nxt = next_cell(self.maze.maze, self.maze_pos, goal)
         if nxt is not None:
             self.direction = dir_to(self.maze_pos, nxt)
