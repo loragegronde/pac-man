@@ -3,7 +3,7 @@ from typing import TypeAlias
 
 import pygame
 
-from src.visual.dijkstra import dir_to, next_cell
+from src.visual.pathfinding import dir_to, next_cell
 from src.visual.maze import Maze
 
 GhostSprites: TypeAlias = dict[int, list[pygame.Surface]]

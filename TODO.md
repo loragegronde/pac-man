@@ -1,5 +1,4 @@
 mypy - 2
-readme - acampion
 ghosts interactions - eel-kerc
 project management - eel-kerc
 docstring - 2

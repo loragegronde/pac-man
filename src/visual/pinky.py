@@ -1,6 +1,6 @@
 from typing import final, override
 
-from src.visual.dijkstra import dir_to, farthest_cell, next_cell
+from src.visual.pathfinding import dir_to, farthest_cell, next_cell
 from src.visual.enemy import Enemy
 
 

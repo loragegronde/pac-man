@@ -31,11 +31,11 @@ class Maze:
             (((-1, 1), (-2, 1), (-3, 2)), ((-1, -1), (-2, -1), (-3, -2))),
         ),
     }
-    WALL_SIZE = 50
-    ANGLE_SIZE = 3
+    WALL_SIZE: int = 50
+    ANGLE_SIZE: int = 3
 
     def __init__(self, size: Point, seed: int | None) -> None:
-        self.size = size
+        self.size: Point = size
         self.maze: list[list[int]] = (
             MazeGenerator(size, seed=seed).maze
             if seed
@@ -48,6 +48,7 @@ class Maze:
             if self.maze[j][i] == 15
         }
         self.maze_img: pygame.Surface = pygame.Surface((1, 1))
+        self.img: pygame.Surface = pygame.Surface((1, 1))
         self.define_angles()
 
     def define_angles(self) -> None:
@@ -264,4 +265,4 @@ class Maze:
         for i in range(y_img):
             self.img.set_at((0, i), self.BLUE)
             self.img.set_at((x_img - 1, i), self.BLUE)
-        self.img.blit(self.maze_img, (self.ANGLE_SIZE, self.ANGLE_SIZE))
+        _ = self.img.blit(self.maze_img, (self.ANGLE_SIZE, self.ANGLE_SIZE))

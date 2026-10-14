@@ -6,16 +6,18 @@ from enum import Enum
 from src.visual.game import GameMode
 from src.cheats import Cheats
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, ClassVar
 
 
 @dataclass
 class GameData:
     assets: Assets
-    size = (15, 15)
     nb_pacgums: int
     cheats: Cheats
-    ghost_speed = [speed / 100 for speed in range(75, 125, 5)]
+    size: ClassVar[tuple[int, int]] = (15, 15)
+    ghost_speed: ClassVar[list[float]] = [
+        speed / 100 for speed in range(75, 125, 5)
+    ]
 
     def get_data(self, i: int) -> list[Any]:
         return [
