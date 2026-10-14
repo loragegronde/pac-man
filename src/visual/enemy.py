@@ -1,3 +1,5 @@
+"""Base class shared by all ghosts."""
+
 from abc import ABC, abstractmethod
 from typing import TypeAlias
 
@@ -12,6 +14,8 @@ DeadSprites: TypeAlias = dict[int, pygame.Surface]
 
 
 class Enemy(ABC):
+    """Abstract ghost: move, flee, and return home when eaten."""
+
     maze_pos: tuple[int, int]
     home: tuple[int, int]
     pos: tuple[int | float, int | float]
@@ -24,6 +28,15 @@ class Enemy(ABC):
         maze: Maze,
         speed: float,
     ) -> None:
+        """Store sprites, maze, and speed, then spawn the ghost.
+
+        Args:
+            assets: Directional walk frames.
+            afraid: Scared / flashing frames.
+            dead: Eyes-only frames.
+            maze: Current level maze.
+            speed: Movement speed multiplier.
+        """
         self.direction: int = 1
         self.state: float = 0.0
         self.dead: bool = False
@@ -42,6 +55,11 @@ class Enemy(ABC):
         self.speed: float = speed
 
     def update_pos(self, speed: float = 1.0) -> None:
+        """Move one step in the current direction.
+
+        Args:
+            speed: Extra frame speed scale.
+        """
         mx, my = self.maze_pos
         x, y = self.pos
         if not self.maze.maze[my][mx] & self.direction or (
@@ -66,6 +84,7 @@ class Enemy(ABC):
             self.maze_pos = (int(nx) // 50, int(ny) // 50)
 
     def go_home(self) -> None:
+        """Walk cell by cell back to the spawn point, then revive."""
         if self.maze_pos == self.home:
             self.define_pos()
             return
@@ -88,9 +107,18 @@ class Enemy(ABC):
             self.define_pos()
 
     @abstractmethod
-    def define_pos(self) -> None: ...
+    def define_pos(self) -> None:
+        """Reset spawn cell, pixel position, and alive state."""
+        ...
 
     @abstractmethod
     def update_direction(
         self, target: tuple[int, int], pac_dir: int
-    ) -> None: ...
+    ) -> None:
+        """Pick the next direction from Pac-Man's cell and facing.
+
+        Args:
+            target: Pac-Man maze cell.
+            pac_dir: Pac-Man direction bitmask.
+        """
+        ...

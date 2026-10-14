@@ -1,3 +1,5 @@
+"""In-game instructions panel (controls and rules)."""
+
 from __future__ import annotations
 
 import pygame
@@ -7,6 +9,8 @@ from src.menu import draw_double_round_rect, point_in
 
 
 class Instructions:
+    """Show controls and rules, then return to the menu."""
+
     BOX_W: int = 720
     BOX_H: int = 550
     TITLE_W: int = 438
@@ -51,6 +55,14 @@ class Instructions:
         screen_w: int,
         screen_h: int,
     ) -> None:
+        """Center the instructions panel on screen.
+
+        Args:
+            screen: Display surface.
+            assets: Fonts and border colors.
+            screen_w: Window width.
+            screen_h: Window height.
+        """
         self.screen: pygame.Surface = screen
         self.assets: Assets = assets
         self.x: int = (screen_w - self.BOX_W) // 2
@@ -60,11 +72,20 @@ class Instructions:
         self.back_hovered: bool = False
 
     def handle_keydown(self, event: pygame.event.Event) -> str | None:
+        """Close the panel on Esc, Enter, or Space.
+
+        Args:
+            event: A KEYDOWN event.
+
+        Returns:
+            ``"back"`` when the panel should close.
+        """
         if event.key in (pygame.K_ESCAPE, pygame.K_RETURN, pygame.K_SPACE):
             return "back"
         return None
 
     def _back_hit(self) -> tuple[int, int, int, int]:
+        """Hitbox for the BACK label."""
         return (
             self.back_x - 20,
             self.back_y - 8,
@@ -73,11 +94,25 @@ class Instructions:
         )
 
     def click_at(self, mx: int, my: int) -> str | None:
+        """Handle a click on BACK.
+
+        Args:
+            mx: Mouse x.
+            my: Mouse y.
+
+        Returns:
+            ``"back"`` if BACK was clicked.
+        """
         if point_in(mx, my, *self._back_hit()):
             return "back"
         return None
 
     def render(self, dt: float = 0.0) -> None:
+        """Draw the panel content and BACK button.
+
+        Args:
+            dt: Unused frame delta (kept for a uniform API).
+        """
         _ = dt
         a = self.assets
         mx, my = pygame.mouse.get_pos()

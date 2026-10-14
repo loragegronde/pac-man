@@ -1,3 +1,5 @@
+"""Pinky: aims a few cells behind Pac-Man."""
+
 from typing import final, override
 
 from src.visual.pathfinding import dir_to, farthest_cell, next_cell
@@ -7,6 +9,16 @@ from src.visual.enemy import Enemy
 def _behind(
     maze: list[list[int]], target: tuple[int, int], pac_dir: int
 ) -> tuple[int, int]:
+    """Cell up to 3 steps behind Pac-Man.
+
+    Args:
+        maze: Bitmask grid.
+        target: Pac-Man cell.
+        pac_dir: Pac-Man direction bitmask.
+
+    Returns:
+        Farthest walkable cell behind Pac-Man, or ``target``.
+    """
     vec = {8: (-1, 0), 4: (0, 1), 2: (1, 0), 1: (0, -1)}
     dx, dy = vec[pac_dir]
     px, py = target
@@ -22,8 +34,11 @@ def _behind(
 
 @final
 class Pinky(Enemy):
+    """Pink ghost that targets behind Pac-Man."""
+
     @override
     def define_pos(self) -> None:
+        """Spawn near the bottom-left corner."""
         max_y = len(self.maze.maze) - 1
         self.maze_pos = (1, max_y)
         self.home = self.maze_pos
@@ -35,6 +50,12 @@ class Pinky(Enemy):
 
     @override
     def update_direction(self, target: tuple[int, int], pac_dir: int) -> None:
+        """Chase behind Pac-Man, or flee when scared.
+
+        Args:
+            target: Pac-Man maze cell.
+            pac_dir: Pac-Man direction bitmask.
+        """
         x, y = self.pos
         if x % 50 != 7 or y % 50 != 7:
             return

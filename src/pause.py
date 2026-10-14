@@ -1,3 +1,5 @@
+"""Pause overlay with resume, cheats, and main menu."""
+
 from __future__ import annotations
 
 import pygame
@@ -7,6 +9,8 @@ from src.menu import draw_double_round_rect, point_in
 
 
 class PauseMenu:
+    """In-game pause menu."""
+
     OPTIONS: tuple[str, ...] = ("RESUME", "CHEATS", "MAIN MENU")
     LABEL_W: dict[str, int] = {
         "RESUME": 147,
@@ -28,6 +32,14 @@ class PauseMenu:
         screen_w: int,
         screen_h: int,
     ) -> None:
+        """Center the pause box on screen.
+
+        Args:
+            screen: Display surface.
+            assets: Fonts and border colors.
+            screen_w: Window width.
+            screen_h: Window height.
+        """
         self.screen: pygame.Surface = screen
         self.assets: Assets = assets
         self.screen_w: int = screen_w
@@ -40,11 +52,20 @@ class PauseMenu:
         self._last_mouse: tuple[int, int] = (-1, -1)
 
     def reset(self) -> None:
+        """Reset selection and mouse navigation state."""
         self.selected = 0
         self._mouse_nav = True
         self._last_mouse = (-1, -1)
 
     def handle_keydown(self, event: pygame.event.Event) -> str | None:
+        """Move selection or confirm an option.
+
+        Args:
+            event: A KEYDOWN event.
+
+        Returns:
+            Action name, or None if nothing was chosen.
+        """
         if event.key == pygame.K_UP:
             self._mouse_nav = False
             self.selected = (self.selected - 1) % len(self.OPTIONS)
@@ -58,6 +79,15 @@ class PauseMenu:
         return None
 
     def click_at(self, mx: int, my: int) -> str | None:
+        """Select an option under the mouse.
+
+        Args:
+            mx: Mouse x.
+            my: Mouse y.
+
+        Returns:
+            Action name, or None if the click missed.
+        """
         self._mouse_nav = True
         self._last_mouse = (mx, my)
         for i, (x, y, w, h) in enumerate(self._option_hits):
@@ -67,6 +97,7 @@ class PauseMenu:
         return None
 
     def _action(self) -> str:
+        """Map the current selection to an action name."""
         choice = self.OPTIONS[self.selected]
         if choice == "RESUME":
             return "resume"
@@ -75,6 +106,7 @@ class PauseMenu:
         return "menu"
 
     def dim_screen(self) -> None:
+        """Draw a checkerboard dim over the frozen game frame."""
         cell = 2
         for y in range(0, self.screen_h, cell):
             for x in range(0, self.screen_w, cell * 2):
@@ -86,6 +118,11 @@ class PauseMenu:
                 )
 
     def render(self, dt: float = 0.0) -> None:
+        """Draw the pause box and highlight the selected row.
+
+        Args:
+            dt: Unused frame delta (kept for a uniform API).
+        """
         _ = dt
         a = self.assets
         mx, my = pygame.mouse.get_pos()

@@ -1,4 +1,17 @@
+"""BFS helpers to move ghosts through the maze."""
+
+
 def _neighbors(maze: list[list[int]], x: int, y: int) -> list[tuple[int, int]]:
+    """List walkable cells next to ``(x, y)``.
+
+    Args:
+        maze: Bitmask grid (15 = solid).
+        x: Cell column.
+        y: Cell row.
+
+    Returns:
+        Neighbor cells that are open and in bounds.
+    """
     w = len(maze[0])
     h = len(maze)
     cell = maze[y][x]
@@ -22,6 +35,16 @@ def find_path(
     start: tuple[int, int],
     goal: tuple[int, int],
 ) -> list[tuple[int, int]]:
+    """Find a shortest path with BFS.
+
+    Args:
+        maze: Bitmask grid.
+        start: Start cell.
+        goal: Target cell.
+
+    Returns:
+        Cells from start to goal, or an empty list if unreachable.
+    """
     if start == goal:
         return [start]
 
@@ -52,6 +75,15 @@ def farthest_cell(
     maze: list[list[int]],
     from_pos: tuple[int, int],
 ) -> tuple[int, int]:
+    """Return a cell farthest from ``from_pos`` (used when fleeing).
+
+    Args:
+        maze: Bitmask grid.
+        from_pos: Reference cell (usually Pac-Man).
+
+    Returns:
+        The last cell reached by a full BFS flood.
+    """
     prev: dict[tuple[int, int], None] = {from_pos: None}
     queue: list[tuple[int, int]] = [from_pos]
     farthest = from_pos
@@ -71,11 +103,30 @@ def next_cell(
     start: tuple[int, int],
     goal: tuple[int, int],
 ) -> tuple[int, int] | None:
+    """Return the next cell on the path toward ``goal``.
+
+    Args:
+        maze: Bitmask grid.
+        start: Current cell.
+        goal: Target cell.
+
+    Returns:
+        The second cell on the path, or None if already there / stuck.
+    """
     path = find_path(maze, start, goal)
     return path[1] if len(path) >= 2 else None
 
 
 def dir_to(a: tuple[int, int], b: tuple[int, int]) -> int:
+    """Convert a step between two cells into a direction bitmask.
+
+    Args:
+        a: From cell.
+        b: To cell.
+
+    Returns:
+        ``1`` up, ``2`` right, ``4`` down, ``8`` left.
+    """
     ax, ay = a
     bx, by = b
     if by < ay:

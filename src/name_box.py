@@ -1,3 +1,5 @@
+"""Text field used to enter a highscore name."""
+
 from __future__ import annotations
 
 import pygame
@@ -7,6 +9,8 @@ from src.menu import draw_double_round_rect
 
 
 class NameBox:
+    """Simple on-screen name input."""
+
     MAX_LEN: int = 10
     BOX_W: int = 550
     BOX_H: int = 90
@@ -20,6 +24,14 @@ class NameBox:
         screen_w: int,
         screen_h: int,
     ) -> None:
+        """Place the box under the victory / game over banner.
+
+        Args:
+            screen: Display surface.
+            assets: Fonts and border colors.
+            screen_w: Window width.
+            screen_h: Window height.
+        """
         self.screen: pygame.Surface = screen
         self.assets: Assets = assets
         self.text: str = ""
@@ -30,6 +42,7 @@ class NameBox:
         self.y: int = screen_h // 2 + 40
 
     def reset(self) -> None:
+        """Clear the text and restart the cursor blink."""
         self.text = ""
         self.blink_time = 0.0
         self.show_cursor = True
@@ -37,11 +50,20 @@ class NameBox:
         pygame.key.set_repeat(400, 40)
 
     def _on_type(self) -> None:
+        """Reset blink state after a keypress."""
         self.show_cursor = True
         self.blink_time = 0.0
         self.typing_idle = 0.0
 
     def handle_keydown(self, event: pygame.event.Event) -> str | None:
+        """Handle typing, backspace, and submit.
+
+        Args:
+            event: A KEYDOWN event.
+
+        Returns:
+            ``"submit"`` when Enter is pressed on a non-empty name.
+        """
         if event.key == pygame.K_RETURN:
             name = self.text.strip()
             if name:
@@ -62,6 +84,11 @@ class NameBox:
         return None
 
     def render(self, dt: float = 0.0) -> None:
+        """Draw the box, label, and blinking cursor.
+
+        Args:
+            dt: Frame delta time in seconds.
+        """
         a = self.assets
         self.typing_idle += dt
         if self.typing_idle < 0.5:

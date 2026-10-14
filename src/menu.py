@@ -1,3 +1,5 @@
+"""Main menu UI and shared rounded-rect drawing helpers."""
+
 import pygame
 
 from src.assets import Assets, MenuLayout
@@ -5,6 +7,19 @@ from src.highscores import Highscores, ScoreEntry
 
 
 def point_in(mx: int, my: int, x: int, y: int, w: int, h: int) -> bool:
+    """Return True if the point lies inside the rectangle.
+
+    Args:
+        mx: Point x.
+        my: Point y.
+        x: Rect left.
+        y: Rect top.
+        w: Rect width.
+        h: Rect height.
+
+    Returns:
+        Whether ``(mx, my)`` is inside the rect.
+    """
     return x <= mx < x + w and y <= my < y + h
 
 
@@ -18,6 +33,18 @@ def draw_quarter_circle_outline(
     dx_sign: int,
     dy_sign: int,
 ) -> None:
+    """Draw one corner arc of a rounded rectangle outline.
+
+    Args:
+        screen: Target surface.
+        cx: Arc center x.
+        cy: Arc center y.
+        radius: Outer radius.
+        thickness: Stroke width in pixels.
+        color: RGB color.
+        dx_sign: Horizontal quadrant (+1 or -1).
+        dy_sign: Vertical quadrant (+1 or -1).
+    """
     r_outer = radius
     r_inner = max(0, radius - thickness)
     r_out_sq = r_outer * r_outer
@@ -39,6 +66,18 @@ def draw_round_rect_outline(
     radius: int = 18,
     thickness: int = 3,
 ) -> None:
+    """Draw a rounded rectangle outline with pixel corners.
+
+    Args:
+        screen: Target surface.
+        x: Left.
+        y: Top.
+        w: Width.
+        h: Height.
+        color: RGB color.
+        radius: Corner radius.
+        thickness: Stroke width.
+    """
     if w <= 0 or h <= 0 or thickness <= 0:
         return
     r = max(1, min(radius, w // 2, h // 2))
@@ -77,6 +116,20 @@ def draw_double_round_rect(
     gap: int = 5,
     thickness: int = 3,
 ) -> None:
+    """Draw outer and inner rounded borders for UI panels.
+
+    Args:
+        screen: Target surface.
+        x: Left.
+        y: Top.
+        w: Width.
+        h: Height.
+        outer: Outer border color.
+        inner: Inner border color.
+        radius: Outer corner radius.
+        gap: Space between the two borders.
+        thickness: Stroke width.
+    """
     draw_round_rect_outline(screen, x, y, w, h, outer, radius, thickness)
     inset = gap + thickness
     draw_round_rect_outline(
@@ -92,6 +145,8 @@ def draw_double_round_rect(
 
 
 class Menu:
+    """Title screen with play, exit, instructions, and highscores."""
+
     def __init__(
         self,
         screen: pygame.Surface,
@@ -100,6 +155,15 @@ class Menu:
         highscores: Highscores,
         assets: Assets,
     ):
+        """Build the menu layout from screen size and assets.
+
+        Args:
+            screen: Display surface.
+            width: Window width.
+            height: Window height.
+            highscores: Shared highscore table.
+            assets: Images, fonts, and layout constants.
+        """
         self.screen: pygame.Surface = screen
         self.highscores: Highscores = highscores
         self.assets: Assets = assets
@@ -111,6 +175,12 @@ class Menu:
         self.show_hint: bool = True
 
     def set_last_score(self, name: str, score: int) -> None:
+        """Highlight a freshly submitted score in the list.
+
+        Args:
+            name: Player name.
+            score: Player score.
+        """
         self.last_score = {"name": name, "score": score}
         self.highscores.reload()
         rows = self.assets.VISIBLE_ROWS
@@ -123,12 +193,23 @@ class Menu:
                 break
 
     def _max_scroll(self) -> int:
+        """Largest valid scroll offset for the highscore list."""
         return max(0, len(self.highscores.entries) - self.assets.VISIBLE_ROWS)
 
     def scroll_by(self, delta: int) -> None:
+        """Move the highscore list up or down.
+
+        Args:
+            delta: Rows to scroll (negative = up).
+        """
         self.scroll = max(0, min(self._max_scroll(), self.scroll + delta))
 
     def render(self, dt: float = 0.0) -> None:
+        """Draw the title screen.
+
+        Args:
+            dt: Frame delta used for the blinking hint.
+        """
         a = self.assets
         lay = self.layout
 
@@ -197,6 +278,7 @@ class Menu:
         self._draw_panel()
 
     def _draw_panel(self) -> None:
+        """Draw the highscore panel and scroll arrows."""
         a = self.assets
         lay = self.layout
         x, y, w, h = lay.panel_x, lay.panel_y, lay.panel_w, lay.panel_h
@@ -256,6 +338,16 @@ class Menu:
         _ = self.screen.blit(a.down_arrow, lay.down_arrow.topleft)
 
     def click_at(self, mx: int, my: int) -> str | None:
+        """Handle a click on menu controls.
+
+        Args:
+            mx: Mouse x.
+            my: Mouse y.
+
+        Returns:
+            Next state name (``playing``, ``instructions``, ``exit``),
+            or None for scroll-only clicks.
+        """
         a = self.assets
         lay = self.layout
         up = lay.up_arrow

@@ -1,3 +1,5 @@
+"""Images, fonts, sprites, and menu layout constants."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -11,6 +13,18 @@ ASSETS_DIR = Path("assets")
 def crop(
     sheet: pygame.Surface, x: int, y: int, w: int, h: int
 ) -> pygame.Surface:
+    """Cut a rectangle out of a sprite sheet.
+
+    Args:
+        sheet: Source image.
+        x: Left of the crop.
+        y: Top of the crop.
+        w: Width.
+        h: Height.
+
+    Returns:
+        A new surface with the cropped pixels.
+    """
     image = pygame.Surface((w, h), pygame.SRCALPHA)
     _ = image.blit(sheet, (0, 0), (x, y, w, h))
     return image
@@ -18,6 +32,8 @@ def crop(
 
 @dataclass
 class MenuLayout:
+    """Pixel positions for main-menu widgets."""
+
     title_x: int
     title_y: int
     play_x: int
@@ -42,6 +58,8 @@ class MenuLayout:
 
 @dataclass
 class Mob:
+    """Sprite sets for Pac-Man and the four ghosts."""
+
     blinky: dict[int, list[pygame.Surface]]
     pinky: dict[int, list[pygame.Surface]]
     clyde: dict[int, list[pygame.Surface]]
@@ -53,6 +71,7 @@ class Mob:
 
 
 class Assets:
+    """Load and expose all game art with hardcoded sizes."""
 
     TITLE_W: int = 1500
     TITLE_H: int = 340
@@ -108,6 +127,11 @@ class Assets:
     NO_SCORE_H: int = 27
 
     def __init__(self, root: Path = ASSETS_DIR) -> None:
+        """Load PNG assets and prepare fonts.
+
+        Args:
+            root: Folder that contains the image files.
+        """
         self.root: Path = root
 
         self.title: pygame.Surface = self._load("title.png")
@@ -161,12 +185,29 @@ class Assets:
         }
 
     def _load(self, name: str) -> pygame.Surface:
+        """Load one PNG from the assets folder."""
         return pygame.image.load(str(self.root / name)).convert_alpha()
 
     def crop_sprite(self, x: int, y: int, w: int, h: int) -> pygame.Surface:
+        """Crop a region from the main sprite sheet.
+
+        Args:
+            x: Left of the crop.
+            y: Top of the crop.
+            w: Width.
+            h: Height.
+
+        Returns:
+            Cropped sprite surface.
+        """
         return crop(self.sprites, x, y, w, h)
 
     def get_mobs(self) -> Mob:
+        """Build directional animation frames for all characters.
+
+        Returns:
+            A Mob bundle with ghost and Pac-Man sprites.
+        """
         img = self.sprites
 
         blinky_r1: pygame.Surface = crop(img, 651, 4, 35, 35)
@@ -288,6 +329,15 @@ class Assets:
         )
 
     def menu_layout(self, screen_w: int, screen_h: int) -> MenuLayout:
+        """Compute menu widget positions for the current window.
+
+        Args:
+            screen_w: Window width.
+            screen_h: Window height.
+
+        Returns:
+            Layout with coordinates for title, buttons, and panel.
+        """
         title_x = screen_w // 2 - self.TITLE_W // 2
         title_y = screen_h // 6 - self.TITLE_H // 2
         play_x = screen_w // 2 - self.PLAY_W - 100
@@ -343,6 +393,7 @@ class Assets:
         )
 
     def get_pacgum(self) -> None:
+        """Load normal and super pac-gum sprites from the sheet."""
         img = self.sprites
 
         self.pac_gum: pygame.Surface = crop(img, 409, 227, 7, 7)

@@ -1,3 +1,5 @@
+"""Blinky: chases Pac-Man directly."""
+
 from typing import final, override
 
 from src.visual.pathfinding import dir_to, farthest_cell, next_cell
@@ -6,8 +8,11 @@ from src.visual.enemy import Enemy
 
 @final
 class Blinky(Enemy):
+    """Red ghost that targets Pac-Man's exact cell."""
+
     @override
     def define_pos(self) -> None:
+        """Spawn near the top-left corner."""
         self.maze_pos = (1, 0)
         self.home = self.maze_pos
         self.pos = (57, 7)
@@ -18,6 +23,12 @@ class Blinky(Enemy):
 
     @override
     def update_direction(self, target: tuple[int, int], pac_dir: int) -> None:
+        """Chase Pac-Man, or flee to a far cell when scared.
+
+        Args:
+            target: Pac-Man maze cell.
+            pac_dir: Unused (kept for the shared API).
+        """
         _ = pac_dir
         x, y = self.pos
         if x % 50 != 7 or y % 50 != 7:

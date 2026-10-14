@@ -1,3 +1,5 @@
+"""Window loop, scene routing, and starfield background."""
+
 import os
 import pygame
 import time
@@ -20,7 +22,15 @@ os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
 
 def get_star_list(width: int, height: int) -> list[tuple[int, int]]:
+    """Build a list of star positions for the background.
 
+    Args:
+        width: Window width.
+        height: Window height.
+
+    Returns:
+        List of ``(x, y)`` star coordinates.
+    """
     stars: list[tuple[int, int]] = []
     spacing = 60
     row = width // spacing
@@ -37,6 +47,15 @@ def get_star_list(width: int, height: int) -> list[tuple[int, int]]:
 
 
 def make_background(width: int, height: int) -> pygame.Surface:
+    """Create a gradient background dotted with stars.
+
+    Args:
+        width: Window width.
+        height: Window height.
+
+    Returns:
+        Pre-rendered background surface.
+    """
     bg = pygame.Surface((width, height))
     for y in range(height):
         t = y / max(height - 1, 1)
@@ -57,7 +76,16 @@ def make_background(width: int, height: int) -> pygame.Surface:
 
 
 class Graphics:
+    """Own the pygame window and switch between game scenes."""
+
     def __init__(self, width: int, height: int, config: Config):
+        """Create the window and all scene objects.
+
+        Args:
+            width: Window width.
+            height: Window height.
+            config: Parsed game configuration.
+        """
         _ = pygame.init()
         pygame.display.set_caption("pac-man")
         self.screen: pygame.Surface = pygame.display.set_mode((width, height))
@@ -110,6 +138,7 @@ class Graphics:
         self._fps_label_w: int = 140
 
     def _update_fps(self, dt: float) -> None:
+        """Refresh the FPS counter once per second."""
         self._fps_frames += 1
         self._fps_timer += dt
         if self._fps_timer >= 1.0:
@@ -118,6 +147,7 @@ class Graphics:
             self._fps_timer -= 1.0
 
     def _draw_fps(self) -> None:
+        """Blit the current FPS in the top-right corner."""
         text = f"{self._fps_display} FPS"
         surf = self.assets.font_medium.render(text, True, (180, 180, 190))
         _ = self.screen.blit(
@@ -126,6 +156,7 @@ class Graphics:
         )
 
     def run(self) -> None:
+        """Run the main event / render loop until quit."""
         background = make_background(self.width, self.height)
 
         fps = self.config.fps

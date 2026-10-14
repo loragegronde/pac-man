@@ -1,9 +1,13 @@
+"""Victory screen: banner, score, and name entry."""
+
 from src.assets import Assets
 from src.name_box import NameBox
 import pygame
 
 
 class Victory:
+    """Draw the victory overlay."""
+
     SCORE_COLOR: tuple[int, int, int] = (255, 220, 80)
 
     def __init__(
@@ -14,6 +18,15 @@ class Victory:
         screen_w: int,
         screen_h: int,
     ) -> None:
+        """Bind screen, assets, and the shared name box.
+
+        Args:
+            assets: Shared image and font assets.
+            screen: Display surface.
+            name_box: Name input widget.
+            screen_w: Window width.
+            screen_h: Window height.
+        """
         self.assets: Assets = assets
         self.screen: pygame.Surface = screen
         self.name_box: NameBox = name_box
@@ -21,6 +34,12 @@ class Victory:
         self.screen_h: int = screen_h
 
     def render(self, score: int, dt: float = 0.0) -> None:
+        """Draw victory art, score, and name box.
+
+        Args:
+            score: Final player score.
+            dt: Frame delta for the name cursor blink.
+        """
         a = self.assets
         x = (self.screen_w - a.victory_w) // 2
         y = (self.screen_h - a.victory_h) // 2 - 350

@@ -1,3 +1,5 @@
+"""Pause submenu used to toggle debug cheats."""
+
 from __future__ import annotations
 
 import pygame
@@ -9,6 +11,8 @@ from src.visual.level_handler import LevelHandler
 
 
 class CheatMenu:
+    """UI for invincibility, speed, lives, and related options."""
+
     OPTIONS: tuple[tuple[str, str, str], ...] = (
         ("INVINCIBILITY", "check", "invincibility"),
         ("ONE PACGUM", "check", "one_pacgum"),
@@ -51,6 +55,16 @@ class CheatMenu:
         cheats: Cheats,
         game: LevelHandler,
     ) -> None:
+        """Center the cheat panel and bind shared game state.
+
+        Args:
+            screen: Display surface.
+            assets: Fonts and border colors.
+            screen_w: Window width.
+            screen_h: Window height.
+            cheats: Mutable cheat flags.
+            game: Live level handler (lives / level edits).
+        """
         self.screen: pygame.Surface = screen
         self.assets: Assets = assets
         self.cheats: Cheats = cheats
@@ -69,12 +83,21 @@ class CheatMenu:
         self._last_mouse: tuple[int, int] = (-1, -1)
 
     def reset(self) -> None:
+        """Reset selection and drag state."""
         self.selected = 0
         self._dragging_speed = False
         self._mouse_nav = True
         self._last_mouse = (-1, -1)
 
     def handle_keydown(self, event: pygame.event.Event) -> str | None:
+        """Navigate rows or tweak the selected option.
+
+        Args:
+            event: A KEYDOWN event.
+
+        Returns:
+            ``"back"`` when leaving the menu, else None.
+        """
         if event.key == pygame.K_UP:
             self._mouse_nav = False
             self.selected = (self.selected - 1) % len(self.OPTIONS)
@@ -94,6 +117,15 @@ class CheatMenu:
         return None
 
     def click_at(self, mx: int, my: int) -> str | None:
+        """Handle clicks on rows, arrows, and the speed slider.
+
+        Args:
+            mx: Mouse x.
+            my: Mouse y.
+
+        Returns:
+            ``"back"`` if BACK was clicked, else None.
+        """
         self._mouse_nav = True
         self._last_mouse = (mx, my)
         for kind, (left, right) in self._arrow_hits.items():
@@ -120,9 +152,16 @@ class CheatMenu:
         return None
 
     def mouse_up(self) -> None:
+        """Stop dragging the speed slider."""
         self._dragging_speed = False
 
     def mouse_move(self, mx: int, my: int) -> None:
+        """Update hover / slider drag while the mouse moves.
+
+        Args:
+            mx: Mouse x.
+            my: Mouse y.
+        """
         if (mx, my) != self._last_mouse:
             self._last_mouse = (mx, my)
             self._mouse_nav = True
@@ -130,6 +169,7 @@ class CheatMenu:
             self._set_speed_from_x(mx)
 
     def _nudge(self, direction: int) -> None:
+        """Adjust lives, level, or speed with the arrow keys."""
         kind = self.OPTIONS[self.selected][1]
         if kind in ("lives", "level"):
             self._change_int(kind, direction)
@@ -137,6 +177,7 @@ class CheatMenu:
             self._change_speed(0.1 * direction)
 
     def _activate(self) -> str | None:
+        """Toggle a checkbox row or leave via BACK."""
         _label, kind, field = self.OPTIONS[self.selected]
         if kind == "back":
             return "back"
@@ -149,6 +190,7 @@ class CheatMenu:
         return None
 
     def _change_int(self, kind: str, delta: int) -> None:
+        """Change lives or level by ``delta``."""
         if kind == "lives":
             self.game.lives = max(0, self.game.lives + delta)
         elif kind == "level":
@@ -158,11 +200,13 @@ class CheatMenu:
             )
 
     def _change_speed(self, delta: float) -> None:
+        """Nudge the speed multiplier within its limits."""
         value = self.cheats.speed_mult + delta
         value = min(self.SPEED_MAX, max(self.SPEED_MIN, value))
         self.cheats.speed_mult = round(value, 1)
 
     def _set_speed_from_x(self, mx: int) -> None:
+        """Map a mouse x position onto the speed slider."""
         track_x, _y, track_w, _h = self._slider_hit
         if track_w <= 0:
             return
@@ -171,15 +215,18 @@ class CheatMenu:
         self.cheats.speed_mult = round(value, 1)
 
     def _index_of(self, kind: str) -> int:
+        """Return the row index for an option kind."""
         for i, (_label, k, _field) in enumerate(self.OPTIONS):
             if k == kind:
                 return i
         return 0
 
     def _row_y(self, index: int) -> int:
+        """Vertical position of a menu row."""
         return self.y + 100 + index * self.ROW_H
 
     def _row_color(self, index: int, field: str) -> tuple[int, int, int]:
+        """Pick label color for selection / blocked state."""
         if field and self.cheats.is_blocked(field):
             return self.COLOR_GREY
         if index == self.selected:
@@ -187,6 +234,7 @@ class CheatMenu:
         return self.COLOR_LABEL
 
     def _update_hover(self) -> None:
+        """Follow the mouse when mouse navigation is active."""
         mx, my = pygame.mouse.get_pos()
         moved = (mx, my) != self._last_mouse
         self._last_mouse = (mx, my)
@@ -200,6 +248,11 @@ class CheatMenu:
                 return
 
     def render(self, dt: float = 0.0) -> None:
+        """Draw the cheat panel and all option rows.
+
+        Args:
+            dt: Unused frame delta (kept for a uniform API).
+        """
         _ = dt
         self._row_hits = []
         self._arrow_hits = {}
@@ -248,6 +301,7 @@ class CheatMenu:
     def _blit(
         self, text: str, x: int, y: int, color: tuple[int, int, int]
     ) -> None:
+        """Render a short label at ``(x, y)``."""
         surf = self.assets.font_medium.render(text, True, color)
         _ = self.screen.blit(surf, (x, y))
 
@@ -259,6 +313,7 @@ class CheatMenu:
         color: tuple[int, int, int],
         blocked: bool,
     ) -> None:
+        """Draw a checkbox option row."""
         box_color = self.COLOR_GREY if blocked else self.COLOR_BOX
         _ = pygame.draw.rect(
             self.screen,
@@ -288,6 +343,7 @@ class CheatMenu:
         y: int,
         color: tuple[int, int, int],
     ) -> None:
+        """Draw a numeric row with left/right arrows."""
         text_y = y + 4
         hit_y = y - 4
         hit_h = self.ROW_H - 4
@@ -310,6 +366,7 @@ class CheatMenu:
         self._arrow_hits[kind] = (left_hit, right_hit)
 
     def _draw_speed(self, y: int, selected: bool) -> None:
+        """Draw the speed label and slider."""
         color = self.COLOR_SEL if selected else self.COLOR_LABEL
         self._blit(
             f"SPEED  x{self.cheats.speed_mult:.1f}", self.x + 48, y, color
@@ -333,6 +390,7 @@ class CheatMenu:
     def _draw_back(
         self, label: str, y: int, color: tuple[int, int, int]
     ) -> None:
+        """Draw the centered BACK row."""
         self._blit(
             label,
             self.x + (self.BOX_W - self.BACK_W) // 2,

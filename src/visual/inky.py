@@ -1,3 +1,5 @@
+"""Inky: wanders with random open directions."""
+
 import random
 from typing import final, override
 
@@ -6,8 +8,11 @@ from src.visual.enemy import Enemy
 
 @final
 class Inky(Enemy):
+    """Cyan ghost that picks a random path at each junction."""
+
     @override
     def define_pos(self) -> None:
+        """Spawn in the bottom-right corner."""
         max_x = len(self.maze.maze[0]) - 1
         max_y = len(self.maze.maze) - 1
         self.maze_pos = (max_x, max_y)
@@ -20,6 +25,12 @@ class Inky(Enemy):
 
     @override
     def update_direction(self, target: tuple[int, int], pac_dir: int) -> None:
+        """Choose a random open direction (prefer not turning back).
+
+        Args:
+            target: Unused (kept for the shared API).
+            pac_dir: Unused (kept for the shared API).
+        """
         _ = target, pac_dir
         x, y = self.pos
         if x % 50 != 7 or y % 50 != 7:
