@@ -1,13 +1,14 @@
 from abc import ABC, abstractmethod
+from typing import TypeAlias
 
 import pygame
 
 from src.visual.dijkstra import dir_to, next_cell
 from src.visual.maze import Maze
 
-type GhostSprites = dict[int, list[pygame.Surface]]
-type AfraidSprites = dict[str, list[pygame.Surface]]
-type DeadSprites = dict[int, pygame.Surface]
+GhostSprites: TypeAlias = dict[int, list[pygame.Surface]]
+AfraidSprites: TypeAlias = dict[str, list[pygame.Surface]]
+DeadSprites: TypeAlias = dict[int, pygame.Surface]
 
 
 class Enemy(ABC):
@@ -21,7 +22,7 @@ class Enemy(ABC):
         afraid: AfraidSprites,
         dead: DeadSprites,
         maze: Maze,
-        speed: float
+        speed: float,
     ) -> None:
         self.direction: int = 1
         self.state: float = 0.0
@@ -38,7 +39,7 @@ class Enemy(ABC):
             1: (0, -1),
         }
         self.define_pos()
-        self.speed = speed
+        self.speed: float = speed
 
     def update_pos(self, speed: float = 1.0) -> None:
         mx, my = self.maze_pos
@@ -53,9 +54,8 @@ class Enemy(ABC):
             mx * 50 + (dx * 50) + 7,
             my * 50 + (dy * 50) + 7,
         )
-        dx *= speed * self.speed
-        dy *= speed * self.speed
-        nx, ny = x + dx, y + dy
+        nx = x + dx * speed * self.speed
+        ny = y + dy * speed * self.speed
         self.pos = (
             max((nx, ny), next_cell)
             if self.direction in {1, 8}

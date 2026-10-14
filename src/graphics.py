@@ -14,6 +14,7 @@ from src.name_box import NameBox
 from src.pause import PauseMenu
 from src.cheats import Cheats
 from src.cheat_menu import CheatMenu
+from src.instructions import Instructions
 
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
@@ -98,6 +99,9 @@ class Graphics:
             self.cheats,
             self.game,
         )
+        self.instructions: Instructions = Instructions(
+            self.screen, self.assets, width, height
+        )
         self.pause_bg: pygame.Surface | None = None
         self.last_score: int = 0
         self._fps_frames: int = 0
@@ -150,6 +154,10 @@ class Graphics:
                             self.state = "playing"
                         elif event.key == pygame.K_ESCAPE:
                             self.running = False
+                    elif self.state == "instructions":
+                        action = self.instructions.handle_keydown(event)
+                        if action == "back":
+                            self.state = "menu"
                     elif self.state == "playing":
                         self.game.mazes[self.game.level].get_direction(event)
                         if event.key == pygame.K_ESCAPE:
@@ -200,6 +208,14 @@ class Graphics:
                         if clicked == "playing":
                             self.game.reset()
                             self.state = "playing"
+                        elif clicked == "instructions":
+                            self.state = "instructions"
+                        elif clicked == "exit":
+                            self.running = False
+                    elif self.state == "instructions":
+                        action = self.instructions.click_at(*event.pos)
+                        if action == "back":
+                            self.state = "menu"
                     elif self.state == "pause":
                         action = self.pause.click_at(*event.pos)
                         if action == "resume":
@@ -228,6 +244,8 @@ class Graphics:
             _ = self.screen.blit(background, (0, 0))
             if self.state == "menu":
                 self.menu.render(dt)
+            elif self.state == "instructions":
+                self.instructions.render(dt)
             elif self.state == "playing":
                 if self.game.lives == 0 or self.game.time_left <= 0:
                     self.state = "game_over"
@@ -259,9 +277,9 @@ class Graphics:
                 _ = self.screen.blit(self.pause_bg, (0, 0))
                 self.cheat_menu.render(dt)
             elif self.state == "victory":
-                self.victory.render(dt)
+                self.victory.render(self.last_score, dt)
             elif self.state == "game_over":
-                self.game_over.render(dt)
+                self.game_over.render(self.last_score, dt)
 
             self._draw_fps()
             pygame.display.flip()

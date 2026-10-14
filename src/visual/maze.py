@@ -1,12 +1,14 @@
+from typing import TypeAlias
+
 from mazegenerator import MazeGenerator
 import pygame
 
-type Point = tuple[int, int]
-type Color = tuple[int, int, int]
-type CornerTriple = tuple[Point, Point, Point]
-type SideCorners = tuple[CornerTriple, CornerTriple]
-type WallAngles = tuple[SideCorners, SideCorners]
-type AngleEntry = tuple[int, int, Point, Point, WallAngles]
+Point: TypeAlias = tuple[int, int]
+Color: TypeAlias = tuple[int, int, int]
+CornerTriple: TypeAlias = tuple[Point, Point, Point]
+SideCorners: TypeAlias = tuple[CornerTriple, CornerTriple]
+WallAngles: TypeAlias = tuple[SideCorners, SideCorners]
+AngleEntry: TypeAlias = tuple[int, int, Point, Point, WallAngles]
 
 
 class Maze:
@@ -34,10 +36,11 @@ class Maze:
 
     def __init__(self, size: Point, seed: int | None) -> None:
         self.size = size
-        if seed:
-            self.maze: list[list[int]] = MazeGenerator(size, seed=seed).maze
-        else:
-            self.maze: list[list[int]] = MazeGenerator(size).maze
+        self.maze: list[list[int]] = (
+            MazeGenerator(size, seed=seed).maze
+            if seed
+            else MazeGenerator(size).maze
+        )
         self.forty_two: set[Point] = {
             (i, j)
             for i in range(len(self.maze[0]))
@@ -250,7 +253,7 @@ class Maze:
                 self.maze_img.set_at((new_x, new_y), self.BLUE)
         return 0
 
-    def draw_border(self):
+    def draw_border(self) -> None:
         x, y = self.size
         x_img = x * self.WALL_SIZE + self.ANGLE_SIZE * 2 + 1
         y_img = y * self.WALL_SIZE + self.ANGLE_SIZE * 2 + 1

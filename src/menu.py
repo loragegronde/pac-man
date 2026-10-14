@@ -142,14 +142,58 @@ class Menu:
             _ = self.screen.blit(a.hint, (lay.hint_x, lay.hint_y))
 
         mx, my = pygame.mouse.get_pos()
-        hovered = (
-            lay.play_x <= mx < lay.play_x + a.PLAY_W
-            and lay.play_y <= my < lay.play_y + a.PLAY_H
+        play_hovered = point_in(
+            mx, my, lay.play_x, lay.play_y, a.PLAY_W, a.PLAY_H
         )
         _ = self.screen.blit(
-            a.play_hovered if hovered else a.play,
+            a.play_hovered if play_hovered else a.play,
             (lay.play_x, lay.play_y),
         )
+
+        exit_hovered = point_in(
+            mx, my, lay.exit_x, lay.exit_y, lay.exit_w, lay.exit_h
+        )
+        draw_double_round_rect(
+            self.screen,
+            lay.exit_x,
+            lay.exit_y,
+            lay.exit_w,
+            lay.exit_h,
+            outer=a.BORDER_OUTER,
+            inner=a.BORDER_INNER,
+            radius=a.BORDER_RADIUS,
+        )
+        exit_color = (255, 255, 120) if exit_hovered else (220, 220, 230)
+        exit_label = a.font_medium.render("EXIT", True, exit_color)
+        _ = self.screen.blit(
+            exit_label,
+            (
+                lay.exit_x
+                + (lay.exit_w - a.EXIT_LABEL_W) // 2
+                + a.EXIT_LABEL_OX,
+                lay.exit_y + (lay.exit_h - a.FONT_MEDIUM_H) // 2,
+            ),
+        )
+
+        instr_hovered = point_in(
+            mx,
+            my,
+            lay.instructions_x,
+            lay.instructions_y,
+            lay.instructions_w,
+            lay.instructions_h,
+        )
+        instr_color = (220, 220, 120) if instr_hovered else (140, 140, 155)
+        instr_label = a.font.render("INSTRUCTIONS", True, instr_color)
+        _ = self.screen.blit(
+            instr_label,
+            (
+                lay.instructions_x
+                + (lay.instructions_w - a.INSTR_LABEL_W) // 2,
+                lay.instructions_y,
+            ),
+        )
+
         self._draw_panel()
 
     def _draw_panel(self) -> None:
@@ -224,4 +268,15 @@ class Menu:
             return None
         if point_in(mx, my, lay.play_x, lay.play_y, a.PLAY_W, a.PLAY_H):
             return "playing"
+        if point_in(
+            mx,
+            my,
+            lay.instructions_x,
+            lay.instructions_y,
+            lay.instructions_w,
+            lay.instructions_h,
+        ):
+            return "instructions"
+        if point_in(mx, my, lay.exit_x, lay.exit_y, lay.exit_w, lay.exit_h):
+            return "exit"
         return None

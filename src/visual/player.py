@@ -45,9 +45,8 @@ class Player:
             maze_x * 50 + (next_x * 50) + 7,
             maze_y * 50 + (next_y * 50) + 7,
         )
-        next_x *= speed
-        next_y *= speed
-        new_x, new_y = (x + next_x, y + next_y)
+        new_x = x + next_x * speed
+        new_y = y + next_y * speed
         self.pos = (
             max((new_x, new_y), next_cell)
             if self.direction in {1, 8}

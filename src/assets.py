@@ -22,6 +22,14 @@ class MenuLayout:
     title_y: int
     play_x: int
     play_y: int
+    instructions_x: int
+    instructions_y: int
+    instructions_w: int
+    instructions_h: int
+    exit_x: int
+    exit_y: int
+    exit_w: int
+    exit_h: int
     hint_x: int
     hint_y: int
     panel_x: int
@@ -51,6 +59,14 @@ class Assets:
 
     PLAY_W: int = 440
     PLAY_H: int = 123
+    EXIT_W: int = 280
+    EXIT_H: int = 70
+    EXIT_GAP: int = 128
+    EXIT_LABEL_OX: int = 10
+    INSTR_W: int = 230
+    INSTR_H: int = 28
+    INSTR_BOTTOM: int = 36
+    INSTR_LABEL_W: int = 218
 
     HS_BANNER_SRC_W: int = 614
     HS_BANNER_SRC_H: int = 75
@@ -82,6 +98,10 @@ class Assets:
     DIGIT_W: int = 16
     CHAR_W_MEDIUM: int = 26
     CHAR_W_LARGE: int = 37
+    FONT_MEDIUM_H: int = 36
+    FONT_LARGE_H: int = 58
+    EXIT_LABEL_W: int = 104
+    SCORE_LABEL_W: int = 130
     HINT_W: int = 352
     HINT_H: int = 34
     NO_SCORE_W: int = 116
@@ -272,6 +292,14 @@ class Assets:
         title_y = screen_h // 6 - self.TITLE_H // 2
         play_x = screen_w // 2 - self.PLAY_W - 100
         play_y = (screen_h // 2) + 100
+        exit_w = self.EXIT_W
+        exit_h = self.EXIT_H
+        exit_x = play_x + (self.PLAY_W - exit_w) // 2
+        exit_y = play_y + self.PLAY_H + self.EXIT_GAP
+        instr_w = self.INSTR_W
+        instr_h = self.INSTR_H
+        instr_x = play_x + (self.PLAY_W - instr_w) // 2
+        instr_y = screen_h - self.INSTR_BOTTOM - instr_h
 
         hint_x = screen_w // 2 - self.hint_w - 150
         hint_y = screen_h // 3 + 180
@@ -296,6 +324,14 @@ class Assets:
             title_y=title_y,
             play_x=play_x,
             play_y=play_y,
+            instructions_x=instr_x,
+            instructions_y=instr_y,
+            instructions_w=instr_w,
+            instructions_h=instr_h,
+            exit_x=exit_x,
+            exit_y=exit_y,
+            exit_w=exit_w,
+            exit_h=exit_h,
             hint_x=hint_x,
             hint_y=hint_y,
             panel_x=panel_x,
@@ -306,7 +342,7 @@ class Assets:
             down_arrow=down_arrow,
         )
 
-    def get_pacgum(self):
+    def get_pacgum(self) -> None:
         img = self.sprites
 
         self.pac_gum: pygame.Surface = crop(img, 409, 227, 7, 7)

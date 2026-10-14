@@ -64,7 +64,7 @@ class LevelHandler:
         self.frame: int = 0
         self.state: VisualState = VisualState.START
         self.score: int = 0
-        self.speed = 60 / self.config.fps
+        self.speed: float = 60 / self.config.fps
 
     def reset(self) -> None:
         self.level = 0
@@ -118,7 +118,7 @@ class LevelHandler:
     def death_animation(self) -> None:
         dead_anim = self.assets.get_mobs().pac_man_spawn
         if self.dead_frame == -1:
-            time = 1
+            time = 1.0
         else:
             time = 0.1
         if self.dt > time:
