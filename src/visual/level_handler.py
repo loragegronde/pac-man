@@ -6,6 +6,7 @@ from enum import Enum
 from src.visual.game import GameMode
 from src.cheats import Cheats
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass
@@ -16,7 +17,7 @@ class GameData:
     cheats: Cheats
     ghost_speed = [speed / 100 for speed in range(75, 125, 5)]
 
-    def get_data(self, i: int):
+    def get_data(self, i: int) -> list[Any]:
         return [
             self.assets,
             self.size,
@@ -91,12 +92,16 @@ class LevelHandler:
         game = self.mazes[self.level]
         if self.cheats.one_pacgum and len(game.pacgums) > 1:
             game.pacgums = {game.pacgums.pop()}
-            game.pacgums_missing = len(game.pacgums) + len(game.super_pacgum)
-        _ = self.window.blit(game.maze.img, game.maze_pos)
+            game.super_pacgum = set()
+            game.pacgums_missing = len(game.pacgums)
+        maze_x, maze_y = game.maze_pos
+        maze_x -= game.maze.ANGLE_SIZE
+        maze_y -= game.maze.ANGLE_SIZE
+        _ = self.window.blit(game.maze.img, (maze_x, maze_y))
         self.place_pacgum(game)
         self.score = sum(m.score for m in self.mazes)
         if game.dead:
-            self.death_animation(dt)
+            self.death_animation()
             self.hud.render(
                 self.score, self.lives, self.level, self.time_left, dt
             )
@@ -110,7 +115,7 @@ class LevelHandler:
             self.frame += 1
             self.dt -= 0.14
 
-    def death_animation(self, dt: float = 0.0):
+    def death_animation(self) -> None:
         dead_anim = self.assets.get_mobs().pac_man_spawn
         if self.dead_frame == -1:
             time = 1
@@ -138,7 +143,7 @@ class LevelHandler:
                 (x + img_x, y + img_y),
             )
 
-    def place_pacgum(self, game: GameMode):
+    def place_pacgum(self, game: GameMode) -> None:
         maze_x, maze_y = game.maze_pos
         for pacgum in game.pacgums:
             x, y = pacgum
@@ -159,7 +164,7 @@ class LevelHandler:
                 ),
             )
 
-    def draw_player(self):
+    def draw_player(self) -> None:
         game = (
             self.mazes[self.level]
             if self.level != 10
@@ -173,7 +178,7 @@ class LevelHandler:
             (p_x + img_x, p_y + img_y),
         )
 
-    def draw_ghosts(self, dt: float = 0.0):
+    def draw_ghosts(self, dt: float = 0.0) -> None:
         game = self.mazes[self.level]
         img_x, img_y = game.maze_pos
 

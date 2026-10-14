@@ -1,4 +1,4 @@
-from unpacked_mazegenerator.mazegenerator import MazeGenerator
+from mazegenerator import MazeGenerator
 import pygame
 
 type Point = tuple[int, int]
@@ -33,6 +33,7 @@ class Maze:
     ANGLE_SIZE = 3
 
     def __init__(self, size: Point, seed: int | None) -> None:
+        self.size = size
         if seed:
             self.maze: list[list[int]] = MazeGenerator(size, seed=seed).maze
         else:
@@ -43,7 +44,7 @@ class Maze:
             for j in range(len(self.maze))
             if self.maze[j][i] == 15
         }
-        self.img: pygame.Surface = pygame.Surface((1, 1))
+        self.maze_img: pygame.Surface = pygame.Surface((1, 1))
         self.define_angles()
 
     def define_angles(self) -> None:
@@ -67,7 +68,7 @@ class Maze:
         self.maze[j][i] = wall
 
     def create_maze(self, img: pygame.Surface) -> None:
-        self.img = img
+        self.maze_img = img
         for cell in self.forty_two:
             self.modify_42(*cell)
         for j in range(len(self.maze)):
@@ -76,6 +77,7 @@ class Maze:
         for cell in self.forty_two:
             i, j = cell
             self.maze[j][i] = 15
+        self.draw_border()
 
     def draw_cell(self, wall: int, coordinates: Point) -> None:
         x, y = coordinates
@@ -108,7 +110,7 @@ class Maze:
                 cell,
             )
             for i in range(3 - first, 48 + second):
-                self.img.set_at(
+                self.maze_img.set_at(
                     (
                         x * self.WALL_SIZE + self.ANGLE_SIZE,
                         y * self.WALL_SIZE + i,
@@ -143,7 +145,7 @@ class Maze:
                 cell,
             )
             for i in range(3 - first, 48 + second):
-                self.img.set_at(
+                self.maze_img.set_at(
                     (
                         x * self.WALL_SIZE + i,
                         y * self.WALL_SIZE + self.WALL_SIZE - self.ANGLE_SIZE,
@@ -178,7 +180,7 @@ class Maze:
                 cell,
             )
             for i in range(3 - second, 48 + first):
-                self.img.set_at(
+                self.maze_img.set_at(
                     (
                         x * self.WALL_SIZE + self.WALL_SIZE - self.ANGLE_SIZE,
                         y * self.WALL_SIZE + i,
@@ -212,7 +214,7 @@ class Maze:
                 cell,
             )
             for i in range(3 - second, 48 + first):
-                self.img.set_at(
+                self.maze_img.set_at(
                     (
                         x * self.WALL_SIZE + i,
                         y * self.WALL_SIZE + self.ANGLE_SIZE,
@@ -236,7 +238,7 @@ class Maze:
         if cell & side:
             for corner_x, corner_y in pixels[0]:
                 new_x, new_y = x + corner_x - v_x * 3, y + corner_y - v_y * 3
-                self.img.set_at((new_x, new_y), self.BLUE)
+                self.maze_img.set_at((new_x, new_y), self.BLUE)
             return -self.ANGLE_SIZE
         elif not (0 <= side_y <= 15 and 0 <= side_x <= 15):
             return self.ANGLE_SIZE
@@ -245,5 +247,18 @@ class Maze:
         else:
             for corner_x, corner_y in pixels[1]:
                 new_x, new_y = x + corner_x, y + corner_y
-                self.img.set_at((new_x, new_y), self.BLUE)
+                self.maze_img.set_at((new_x, new_y), self.BLUE)
         return 0
+
+    def draw_border(self):
+        x, y = self.size
+        x_img = x * self.WALL_SIZE + self.ANGLE_SIZE * 2 + 1
+        y_img = y * self.WALL_SIZE + self.ANGLE_SIZE * 2 + 1
+        self.img = pygame.Surface((x_img, y_img))
+        for i in range(x_img):
+            self.img.set_at((i, 0), self.BLUE)
+            self.img.set_at((i, y_img - 1), self.BLUE)
+        for i in range(y_img):
+            self.img.set_at((0, i), self.BLUE)
+            self.img.set_at((x_img - 1, i), self.BLUE)
+        self.img.blit(self.maze_img, (self.ANGLE_SIZE, self.ANGLE_SIZE))

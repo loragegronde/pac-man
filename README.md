@@ -1,3 +1,5 @@
+*This project has been created as part of the 42 curriculum by acampion and eel-kerc.*
+
 # Pac-Man
 
 ## Config keys (`config.json`)

@@ -33,7 +33,7 @@ class GameMode:
         self.dead: bool = False
         self.prev = self.player.pos
 
-    def define_maze_pos(self, size: tuple[int, int]):
+    def define_maze_pos(self, size: tuple[int, int]) -> None:
         x, y = size
         self.maze_pos: tuple[int, int] = (
             950 - ((x // 2) * 50),
@@ -68,7 +68,7 @@ class GameMode:
         elif event.key == pygame.K_UP:
             self.player.next_direction = 1
 
-    def define_pacgum_pos(self, nb_pacgum: int):
+    def define_pacgum_pos(self, nb_pacgum: int) -> None:
         max_x = len(self.maze.maze[0])
         max_y = len(self.maze.maze)
         available = {
@@ -93,7 +93,7 @@ class GameMode:
             i += 1
         self.pacgums_missing: int = i + 4
 
-    def check_interaction(self, config: Config):
+    def check_interaction(self, config: Config) -> None:
         x, y = self.player.pos
         px, py = self.prev
         max_x, min_x = max(x, px), min(x, px)

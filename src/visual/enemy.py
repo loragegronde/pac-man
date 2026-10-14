@@ -49,12 +49,21 @@ class Enemy(ABC):
             dx, dy = self.vector[self.direction]
         else:
             dx, dy = 0, 0
-        dx *= speed
-        dy *= speed
+        next_cell = (
+            mx * 50 + (dx * 50) + 7,
+            my * 50 + (dy * 50) + 7,
+        )
+        dx *= speed * self.speed
+        dy *= speed * self.speed
         nx, ny = x + dx, y + dy
-        if nx % 50 == 7 and ny % 50 == 7:
+        self.pos = (
+            max((nx, ny), next_cell)
+            if self.direction in {1, 8}
+            else min((nx, ny), next_cell)
+        )
+        x, y = self.pos
+        if x % 50 == 7 and y % 50 == 7:
             self.maze_pos = (int(nx) // 50, int(ny) // 50)
-        self.pos = (nx, ny)
 
     def go_home(self) -> None:
         if self.maze_pos == self.home:
