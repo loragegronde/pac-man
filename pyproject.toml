@@ -21,3 +21,8 @@ reportAny = false
 
 [tool.uv.sources]
 mazegenerator = { path = "mazegenerator-2.1.0-py3-none-any.whl" }
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.22.3",
+]

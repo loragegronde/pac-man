@@ -1,7 +1,7 @@
 PYTHON ?= python3
 UV ?= uv
 
-.PHONY: install run debug clean lint lint-strict
+.PHONY: install run build debug clean lint lint-strict
 
 install:
 	$(UV) sync
@@ -9,12 +9,19 @@ install:
 run:
 	$(UV) run $(PYTHON) pac-man.py config.json
 
+build:
+	$(UV) run pyinstaller --onefile --noconfirm --name pac-man \
+		--add-data "assets:assets" \
+		--add-data "config.json:." \
+		pac-man.py
+
 debug:
 	$(UV) run $(PYTHON) -m pdb -m pac-man.py config.json
 
 clean:
 	find . -type d -name __pycache__ -prune -exec rm -rf {} +
 	find . -type d -name .mypy_cache -prune -exec rm -rf {} +
+	rm -rf build dist
 	find . -type f -name "*.pyc" -delete
 	find . -type f -name "*.pyo" -delete
 
