@@ -198,6 +198,7 @@ class CheatMenu:
                 self.LEVEL_MAX,
                 max(self.LEVEL_MIN, self.game.level + delta),
             )
+            self.game.time_left = self.game.config.level_max_time
 
     def _change_speed(self, delta: float) -> None:
         """Nudge the speed multiplier within its limits."""
