@@ -207,6 +207,7 @@ If we port this to MLX someday, here's how the calls line up:
 There are two of us, **acampion** and **eel-kerc**. One focused on parsing,
 UI nad made the ghosts, the other on gameplay and all maze related task. Tasks, owners, and status are tracked in
 [project_management/](project_management/).
+Our project is also available on itch at [https://loragegronde.itch.io/pac-man] with the code "pacman"
 
 ## Resources
 
