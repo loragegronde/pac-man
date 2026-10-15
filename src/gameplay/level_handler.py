@@ -58,11 +58,11 @@ class LevelHandler:
         self.nb_pacgum: int = config.pacgum
         self.lives: int = config.lives
         self.time_left: float = float(config.level_max_time)
-        data = GameData(
+        self.data = GameData(
             assets=assets, nb_pacgums=self.nb_pacgum, cheats=cheats
         )
         self.mazes: list[GameMode] = [
-            GameMode(*data.get_data(i)) for i in range(10)
+            GameMode(*self.data.get_data(i)) for i in range(10)
         ]
         self.hud: Hud = Hud(window, assets)
         self.dead: bool = False
@@ -83,6 +83,9 @@ class LevelHandler:
         self.dead_frame = -1
         self.frame = 0
         self.score = 0
+        self.mazes = [
+            GameMode(*self.data.get_data(i)) for i in range(10)
+        ]
 
     def refresh_frame(self, dt: float) -> None:
         """Update all positions of assets in the game.
@@ -92,6 +95,7 @@ class LevelHandler:
             dt: time between current frame and last frame
         """
         self.dt += dt
+        self.score = sum(m.score for m in self.mazes)
         if self.cheats.always_chase:
             for ghost in self.mazes[self.level].ghosts.ghosts:
                 ghost.state = 5
@@ -110,7 +114,6 @@ class LevelHandler:
         maze_y -= game.maze.ANGLE_SIZE
         _ = self.window.blit(game.maze.img, (maze_x, maze_y))
         self.place_pacgum(game)
-        self.score = sum(m.score for m in self.mazes)
         if game.dead:
             self.death_animation()
             self.hud.render(

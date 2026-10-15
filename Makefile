@@ -24,6 +24,7 @@ clean:
 	rm -rf build dist
 	find . -type f -name "*.pyc" -delete
 	find . -type f -name "*.pyo" -delete
+	rm -f pac-man.spec
 
 lint:
 	$(UV) run flake8 . --exclude .venv
