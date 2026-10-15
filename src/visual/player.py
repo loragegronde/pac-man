@@ -5,8 +5,16 @@ from src.visual.maze import Maze
 
 
 class Player:
+    """Handle player's movement on the maze"""
+
     def __init__(self, maze: Maze, assets: Mob) -> None:
-        self.maze: Maze = maze
+        """Initialize starting player pos and state
+
+        Args:
+            maze: instance of maze and it's visual
+            assets: player's assets to get
+        """
+        self.maze: list[list[int]] = maze.maze
         self.define_start_pos()
         self.direction: int = 2
         self.next_direction: int = 2
@@ -23,8 +31,9 @@ class Player:
         }
 
     def define_start_pos(self) -> None:
-        max_x = len(self.maze.maze[0])
-        max_y = len(self.maze.maze)
+        """Define starting position of the player at the middle of the maze"""
+        max_x = len(self.maze[0])
+        max_y = len(self.maze)
         self.maze_pos: tuple[int, int] = ((max_x - 1) // 2, (max_y - 1) // 2)
         self.pos: tuple[float, float] = (
             self.maze_pos[0] * 50 + 7,
@@ -32,10 +41,16 @@ class Player:
         )
 
     def update_pos(self, speed: float) -> None:
+        """Update player's position if possible and his maze's position
+        if on the middle of the cell
+
+        Args:
+            speed: multiplier of the player's vector movement
+        """
         self.define_movement()
         maze_x, maze_y = self.maze_pos
         x, y = self.pos
-        if not self.maze.maze[maze_y][maze_x] & self.direction or (
+        if not self.maze[maze_y][maze_x] & self.direction or (
             x % 50 != 7 or y % 50 != 7
         ):
             next_x, next_y = self.vector[self.direction]
@@ -54,6 +69,7 @@ class Player:
         )
 
     def define_movement(self) -> None:
+        """Update player's direction if possible"""
         x, y = self.pos
         if x % 50 == 7 and y % 50 == 7:
             self.maze_pos = (int(x // 50), int(y // 50))
@@ -66,8 +82,8 @@ class Player:
         maze_x, maze_y = self.maze_pos
         if (
             (
-                not self.maze.maze[maze_y][maze_x] & self.next_direction
-                or self.maze.maze[maze_y][maze_x] & self.direction
+                not self.maze[maze_y][maze_x] & self.next_direction
+                or self.maze[maze_y][maze_x] & self.direction
             )
             and x % 50 == 7
             and y % 50 == 7

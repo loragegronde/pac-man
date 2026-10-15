@@ -1,6 +1,7 @@
 """Blinky: chases Pac-Man directly."""
 
-from typing import final, override
+from typing import final
+from typing_extensions import override
 
 from src.visual.pathfinding import dir_to, farthest_cell, next_cell
 from src.visual.enemy import Enemy

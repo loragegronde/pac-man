@@ -8,6 +8,8 @@ import pygame
 
 
 class GameMode:
+    """Handle a game with game state, player and enemys. Make them interact"""
+
     def __init__(
         self,
         assets: Assets,
@@ -17,6 +19,16 @@ class GameMode:
         speed: float,
         seed: int | None = None,
     ) -> None:
+        """Initialize default game state.
+
+        Args:
+            assets: Sprite sets for every character.
+            size: x nb of cells and y numbers of cells of the maze
+            nb_pacgum: number of pacgum needed at the creation of the maze
+            cheats: instance which tells if cheats are actives
+            speed: starting speed of the ghost
+            seed: seed to determine randomness of maze generation
+        """
         self.define_maze_pos(size)
         self.assets: Assets = assets
         self.cheats: Cheats = cheats
@@ -34,6 +46,7 @@ class GameMode:
         self.prev = self.player.pos
 
     def define_maze_pos(self, size: tuple[int, int]) -> None:
+        """Define position of the maze on the window"""
         x, y = size
         self.maze_pos: tuple[int, int] = (
             950 - ((x // 2) * 50),
@@ -43,6 +56,13 @@ class GameMode:
     def update_frame(
         self, config: Config, dt: float = 0.0, speed: float = 1.0
     ) -> None:
+        """Update all assets movements and interactions
+
+        Args:
+            config: game's default state and configuration
+            dt: time between current frame and last frame
+            speed: assets speed who depends of game's fps
+        """
         if self.eat_freeze > 0:
             self.eat_freeze = max(0.0, self.eat_freeze - dt)
             return
@@ -57,6 +77,7 @@ class GameMode:
             )
 
     def get_direction(self, event: pygame.event.Event) -> None:
+        """Update player's interaction with keyboard input"""
         if event.type != pygame.KEYDOWN:
             return
         if event.key == pygame.K_LEFT:
@@ -69,6 +90,7 @@ class GameMode:
             self.player.next_direction = 1
 
     def define_pacgum_pos(self, nb_pacgum: int) -> None:
+        """Place default pacgums at random until all are placed"""
         max_x = len(self.maze.maze[0])
         max_y = len(self.maze.maze)
         available = {
@@ -94,6 +116,7 @@ class GameMode:
         self.pacgums_missing: int = i + 4
 
     def check_interaction(self, config: Config) -> None:
+        """Verify if player has eaten a pacgum or a superpacgum"""
         x, y = self.player.pos
         px, py = self.prev
         max_x, min_x = max(x, px), min(x, px)
@@ -126,15 +149,22 @@ class GameMode:
                         ghost.state = 5
 
     def is_player_dead(self, config: Config) -> None:
+        """Verify interaction with ghosts and update either
+        ghost state or player state
+
+        Args:
+            config: game's default state and configuration
+        """
         min_x, min_y = self.player.pos
-        max_x, max_y = min_x + 35, min_y + 35
+        max_x, max_y = min_x + 30, min_y + 30
         for ghost in self.ghosts.ghosts:
             if ghost.dead:
                 continue
             ghost_min_x, ghost_min_y = ghost.pos
-            ghost_max_x, ghost_max_y = ghost_min_x + 35, ghost_min_y + 35
+            ghost_max_x, ghost_max_y = ghost_min_x + 25, ghost_min_y + 25
             if (
-                min_x <= ghost_min_x <= max_x and min_y <= ghost_min_y <= max_y
+                min_x <= ghost_min_x + 5 <= max_x
+                and min_y <= ghost_min_y + 5 <= max_y
             ) or (
                 min_x <= ghost_max_x <= max_x and min_y <= ghost_max_y <= max_y
             ):
@@ -146,6 +176,7 @@ class GameMode:
                     ghost.dead_wait = 0
                     mx, my = ghost.maze_pos
                     ghost.pos = (mx * 50 + 7, my * 50 + 7)
+                    ghost.speed = min(1.5, ghost.speed + 0.05)
                     self.eat_freeze = 0.7
                     return
                 if not self.cheats.invincibility:

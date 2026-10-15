@@ -12,6 +12,8 @@ AngleEntry: TypeAlias = tuple[int, int, Point, Point, WallAngles]
 
 
 class Maze:
+    """Handle visual representation of the maze"""
+
     BLUE: Color = (66, 147, 245)
     ANGLES: dict[int, WallAngles] = {
         8: (
@@ -35,6 +37,7 @@ class Maze:
     ANGLE_SIZE: int = 3
 
     def __init__(self, size: Point, seed: int | None) -> None:
+        """Initialize maze and maze's image"""
         self.size: Point = size
         self.maze: list[list[int]] = (
             MazeGenerator(size, seed=seed).maze
@@ -52,6 +55,7 @@ class Maze:
         self.define_angles()
 
     def define_angles(self) -> None:
+        """Needed information to draw each angles rounded"""
         self.angles: dict[int, AngleEntry] = {
             8: (1, 4, (0, -1), (0, 1), self.ANGLES[8]),
             4: (8, 2, (-1, 0), (1, 0), self.ANGLES[4]),
@@ -60,6 +64,7 @@ class Maze:
         }
 
     def modify_42(self, i: int, j: int) -> None:
+        """Temporarily modify 42 for visual representation"""
         wall = 15
         if (i - 1, j) in self.forty_two:
             wall -= 8
@@ -72,6 +77,11 @@ class Maze:
         self.maze[j][i] = wall
 
     def create_maze(self, img: pygame.Surface) -> None:
+        """Draw all cells of the maze and maze's border
+
+        Args:
+            img: image to draw the maze on
+        """
         self.maze_img = img
         for cell in self.forty_two:
             self.modify_42(*cell)
@@ -84,6 +94,12 @@ class Maze:
         self.draw_border()
 
     def draw_cell(self, wall: int, coordinates: Point) -> None:
+        """Draw each walls of a cell if there is a wall
+
+        Args:
+            wall: hexa value of the cell which determine walls
+            coordinates: coordinates of the current cell
+        """
         x, y = coordinates
         cell = wall
         if wall & 8:
@@ -236,6 +252,21 @@ class Maze:
         cell_coord: Point,
         cell: int,
     ) -> int:
+        """Draw either inside angle, outside angle or full wall
+        depending of cell state and neighbor cells
+
+        Args:
+            wall: current wall's angles we are drawing
+            side: value of the side wall
+            coord_side: vector of the neighbor cell
+            pixels: pixels possible of the angles to draw
+            coordinates: visual coordinate of the cell
+            cell_coord: maze coordinates of the current cell
+            cell: values of all walls in the cells
+
+        Returns:
+            Value of the pixels that are needed to draw if a full wall is draw
+        """
         x, y = coordinates
         v_x, v_y = coord_side
         side_x, side_y = cell_coord[0] + v_x, cell_coord[1] + v_y
@@ -255,6 +286,7 @@ class Maze:
         return 0
 
     def draw_border(self) -> None:
+        """Draw maze's limits"""
         x, y = self.size
         x_img = x * self.WALL_SIZE + self.ANGLE_SIZE * 2 + 1
         y_img = y * self.WALL_SIZE + self.ANGLE_SIZE * 2 + 1

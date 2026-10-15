@@ -219,7 +219,7 @@ UI nad made the ghosts, the other on gameplay and all maze related task. Tasks, 
 
 ### How we used AI
 
-Acampion used AI assistants to speed things
+**Acampion** used AI assistants to speed things
 up, not to design the game. Specifically, they helped with:
 
 - **UI polish:** menu buttons (Exit, Instructions), layout offsets, and text
@@ -230,6 +230,9 @@ up, not to design the game. Specifically, they helped with:
 
 The core gameplay was designed and written by us: the maze bitmask logic, the
 ghost personalities, and the movement maths. Ai was used to help with the boring parts, not to design the game.
+
+**Eel-kerc** used AI for git (understanding rebase, merge and visualisation) and pygame usage understanding.   
+No AI was used for any other part of the project.   
 
 ## Authors
 

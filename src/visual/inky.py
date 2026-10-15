@@ -1,7 +1,8 @@
 """Inky: wanders with random open directions."""
 
 import random
-from typing import final, override
+from typing import final
+from typing_extensions import override
 
 from src.visual.enemy import Enemy
 

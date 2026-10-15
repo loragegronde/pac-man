@@ -112,9 +112,7 @@ class Enemy(ABC):
         ...
 
     @abstractmethod
-    def update_direction(
-        self, target: tuple[int, int], pac_dir: int
-    ) -> None:
+    def update_direction(self, target: tuple[int, int], pac_dir: int) -> None:
         """Pick the next direction from Pac-Man's cell and facing.
 
         Args:

@@ -1,16 +1,17 @@
 from src.assets import Assets
 from src.parsing import Config
 from src.visual.hud import Hud
-import pygame
-from enum import Enum
 from src.visual.game import GameMode
 from src.cheats import Cheats
 from dataclasses import dataclass
 from typing import Any, ClassVar
+import pygame
 
 
 @dataclass
 class GameData:
+    """Data that are needed for game's creation"""
+
     assets: Assets
     nb_pacgums: int
     cheats: Cheats
@@ -20,6 +21,7 @@ class GameData:
     ]
 
     def get_data(self, i: int) -> list[Any]:
+        """Return game's data depending of level difficulty"""
         return [
             self.assets,
             self.size,
@@ -30,14 +32,9 @@ class GameData:
         ]
 
 
-class VisualState(Enum):
-    START = "start"
-    MAZE = "maze"
-    VICTORY = "victory"
-    DEFEAT = "defeat"
-
-
 class LevelHandler:
+    """Pipeline of all games and handle visualisation of game"""
+
     def __init__(
         self,
         window: pygame.Surface,
@@ -45,6 +42,14 @@ class LevelHandler:
         config: Config,
         cheats: Cheats,
     ) -> None:
+        """Initialize 10 levels pipeline and default frames configuration.
+
+        Args:
+            window: current window to put on assets
+            assets: visual representation of player and ghosts
+            config: game's default state and configuration
+            cheats: instance which tells if cheats are actives
+        """
         self.window: pygame.Surface = window
         self.assets: Assets = assets
         self.config: Config = config
@@ -64,11 +69,11 @@ class LevelHandler:
         self.dt: float = 0.0
         self.dead_frame: int = -1
         self.frame: int = 0
-        self.state: VisualState = VisualState.START
         self.score: int = 0
         self.speed: float = 60 / self.config.fps
 
     def reset(self) -> None:
+        """Reset to default configuration"""
         self.level = 0
         self.nb_pacgum = self.config.pacgum
         self.lives = self.config.lives
@@ -77,11 +82,15 @@ class LevelHandler:
         self.dt = 0.0
         self.dead_frame = -1
         self.frame = 0
-        self.state = VisualState.START
         self.score = 0
-        self.hud.reset()
 
     def refresh_frame(self, dt: float) -> None:
+        """Update all positions of assets in the game.
+        Then draw visual depending on game and assets state.
+
+        Args:
+            dt: time between current frame and last frame
+        """
         self.dt += dt
         if self.cheats.always_chase:
             for ghost in self.mazes[self.level].ghosts.ghosts:
@@ -118,6 +127,7 @@ class LevelHandler:
             self.dt -= 0.14
 
     def death_animation(self) -> None:
+        """Draw death animation of the player"""
         dead_anim = self.assets.get_mobs().pac_man_spawn
         if self.dead_frame == -1:
             time = 1.0
@@ -131,8 +141,9 @@ class LevelHandler:
             self.dead_frame = -1
             self.lives = max(0, self.lives - 1)
             self.mazes[self.level].player.define_start_pos()
-            for i in range(len(self.mazes[self.level].ghosts.ghosts)):
-                self.mazes[self.level].ghosts.ghosts[i].define_pos()
+            for ghost in self.mazes[self.level].ghosts.ghosts:
+                ghost.define_pos()
+                ghost.speed = max(0.5, ghost.speed - 0.05)
             return
         if self.dead_frame == -1:
             self.draw_player()
@@ -146,6 +157,7 @@ class LevelHandler:
             )
 
     def place_pacgum(self, game: GameMode) -> None:
+        """Draw all pacgums remaining on the maze"""
         maze_x, maze_y = game.maze_pos
         for pacgum in game.pacgums:
             x, y = pacgum
@@ -167,6 +179,7 @@ class LevelHandler:
             )
 
     def draw_player(self) -> None:
+        """Draw player on his window position"""
         game = (
             self.mazes[self.level]
             if self.level != 10
@@ -181,6 +194,7 @@ class LevelHandler:
         )
 
     def draw_ghosts(self, dt: float = 0.0) -> None:
+        """Draw all ghosts on position with ghost state"""
         game = self.mazes[self.level]
         img_x, img_y = game.maze_pos
 
