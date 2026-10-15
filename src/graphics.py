@@ -3,20 +3,20 @@
 import os
 import pygame
 import time
-from src.visual.level_handler import LevelHandler
+from src.gameplay.level_handler import LevelHandler
 from pathlib import Path
 from random import randint
-from src.menu import Menu
-from src.highscores import Highscores
-from src.parsing import Config
-from src.assets import Assets
-from src.victory import Victory
-from src.game_over import GameOver
-from src.name_box import NameBox
-from src.pause import PauseMenu
-from src.cheats import Cheats
-from src.cheat_menu import CheatMenu
-from src.instructions import Instructions
+from src.scenes.menu import Menu
+from src.scenes.highscores import Highscores
+from src.parsing.parsing import Config
+from src.utils.assets import Assets
+from src.scenes.victory import Victory
+from src.scenes.game_over import GameOver
+from src.scenes.name_box import NameBox
+from src.scenes.pause import PauseMenu
+from src.scenes.cheats import Cheats
+from src.scenes.cheat_menu import CheatMenu
+from src.scenes.instructions import Instructions
 
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 

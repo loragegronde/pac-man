@@ -1,12 +1,12 @@
 """Owns the four ghosts and updates them each frame."""
 
-from src.assets import Mob
-from src.visual.blinky import Blinky
-from src.visual.clyde import Clyde
-from src.visual.enemy import Enemy
-from src.visual.inky import Inky
-from src.visual.maze import Maze
-from src.visual.pinky import Pinky
+from src.utils.assets import Mob
+from src.gameplay.mobs.blinky import Blinky
+from src.gameplay.mobs.clyde import Clyde
+from src.gameplay.mobs.enemy import Enemy
+from src.gameplay.mobs.inky import Inky
+from src.gameplay.maze import Maze
+from src.gameplay.mobs.pinky import Pinky
 
 
 class EnemyHandler:

@@ -3,8 +3,8 @@
 from typing import final
 from typing_extensions import override
 
-from src.visual.pathfinding import dir_to, farthest_cell, next_cell
-from src.visual.enemy import Enemy
+from src.gameplay.mobs.pathfinding import dir_to, farthest_cell, next_cell
+from src.gameplay.mobs.enemy import Enemy
 
 
 @final

@@ -1,3 +1,0 @@
-from typing import Any
-
-def loads(text: str, *args: Any, **kwargs: Any) -> Any: ...

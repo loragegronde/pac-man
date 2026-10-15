@@ -1,16 +1,16 @@
-"""Clyde: aims a few cells ahead of Pac-Man."""
+"""Pinky: aims a few cells behind Pac-Man."""
 
 from typing import final
 from typing_extensions import override
 
-from src.visual.pathfinding import dir_to, farthest_cell, next_cell
-from src.visual.enemy import Enemy
+from src.gameplay.mobs.pathfinding import dir_to, farthest_cell, next_cell
+from src.gameplay.mobs.enemy import Enemy
 
 
-def _ahead(
+def _behind(
     maze: list[list[int]], target: tuple[int, int], pac_dir: int
 ) -> tuple[int, int]:
-    """Cell up to 3 steps in front of Pac-Man.
+    """Cell up to 3 steps behind Pac-Man.
 
     Args:
         maze: Bitmask grid.
@@ -18,7 +18,7 @@ def _ahead(
         pac_dir: Pac-Man direction bitmask.
 
     Returns:
-        Farthest walkable cell in that direction, or ``target``.
+        Farthest walkable cell behind Pac-Man, or ``target``.
     """
     vec = {8: (-1, 0), 4: (0, 1), 2: (1, 0), 1: (0, -1)}
     dx, dy = vec[pac_dir]
@@ -26,7 +26,7 @@ def _ahead(
     w, h = len(maze[0]), len(maze)
     goal = target
     for i in range(1, 4):
-        nx, ny = px + dx * i, py + dy * i
+        nx, ny = px - dx * i, py - dy * i
         if not (0 <= nx < w and 0 <= ny < h) or maze[ny][nx] == 15:
             break
         goal = (nx, ny)
@@ -34,24 +34,24 @@ def _ahead(
 
 
 @final
-class Clyde(Enemy):
-    """Orange ghost that targets ahead of Pac-Man."""
+class Pinky(Enemy):
+    """Pink ghost that targets behind Pac-Man."""
 
     @override
     def define_pos(self) -> None:
-        """Spawn near the top-right corner."""
-        max_x = len(self.maze.maze[0]) - 1
-        self.maze_pos = (max_x, 1)
+        """Spawn near the bottom-left corner."""
+        max_y = len(self.maze.maze) - 1
+        self.maze_pos = (1, max_y)
         self.home = self.maze_pos
-        self.pos = (max_x * 50 + 7, 57)
-        self.direction = 2
+        self.pos = (57, max_y * 50 + 7)
+        self.direction = 8
         self.state = 0.0
         self.dead = False
         self.dead_wait = 0
 
     @override
     def update_direction(self, target: tuple[int, int], pac_dir: int) -> None:
-        """Chase ahead of Pac-Man, or flee when scared.
+        """Chase behind Pac-Man, or flee when scared.
 
         Args:
             target: Pac-Man maze cell.
@@ -63,7 +63,7 @@ class Clyde(Enemy):
         goal = (
             farthest_cell(self.maze.maze, target)
             if self.state > 0
-            else _ahead(self.maze.maze, target, pac_dir)
+            else _behind(self.maze.maze, target, pac_dir)
         )
         nxt = next_cell(self.maze.maze, self.maze_pos, goal)
         if nxt is not None:

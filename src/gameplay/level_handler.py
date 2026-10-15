@@ -1,8 +1,8 @@
-from src.assets import Assets
-from src.parsing import Config
-from src.visual.hud import Hud
-from src.visual.game import GameMode
-from src.cheats import Cheats
+from src.utils.assets import Assets
+from src.parsing.parsing import Config
+from src.gameplay.hud import Hud
+from src.gameplay.game import GameMode
+from src.scenes.cheats import Cheats
 from dataclasses import dataclass
 from typing import Any, ClassVar
 import pygame

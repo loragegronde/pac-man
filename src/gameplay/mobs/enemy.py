@@ -5,8 +5,8 @@ from typing import TypeAlias
 
 import pygame
 
-from src.visual.pathfinding import dir_to, next_cell
-from src.visual.maze import Maze
+from src.gameplay.mobs.pathfinding import dir_to, next_cell
+from src.gameplay.maze import Maze
 
 GhostSprites: TypeAlias = dict[int, list[pygame.Surface]]
 AfraidSprites: TypeAlias = dict[str, list[pygame.Surface]]

@@ -1,6 +1,6 @@
 import pygame
 
-from src.assets import Assets
+from src.utils.assets import Assets
 
 
 class Hud:

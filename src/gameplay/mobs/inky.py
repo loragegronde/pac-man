@@ -4,7 +4,7 @@ import random
 from typing import final
 from typing_extensions import override
 
-from src.visual.enemy import Enemy
+from src.gameplay.mobs.enemy import Enemy
 
 
 @final

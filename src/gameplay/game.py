@@ -1,9 +1,9 @@
-from src.assets import Assets
-from src.parsing import Config
-from src.visual.maze import Maze
-from src.visual.player import Player
-from src.visual.enemy_handler import EnemyHandler
-from src.cheats import Cheats
+from src.utils.assets import Assets
+from src.parsing.parsing import Config
+from src.gameplay.maze import Maze
+from src.gameplay.player import Player
+from src.gameplay.enemy_handler import EnemyHandler
+from src.scenes.cheats import Cheats
 import pygame
 
 

@@ -1,12 +1,12 @@
-"""Game over screen: banner, score, and name entry."""
+"""Victory screen: banner, score, and name entry."""
 
-from src.assets import Assets
-from src.name_box import NameBox
+from src.utils.assets import Assets
+from src.scenes.name_box import NameBox
 import pygame
 
 
-class GameOver:
-    """Draw the game over overlay."""
+class Victory:
+    """Draw the victory overlay."""
 
     SCORE_COLOR: tuple[int, int, int] = (255, 220, 80)
 
@@ -34,16 +34,16 @@ class GameOver:
         self.screen_h: int = screen_h
 
     def render(self, score: int, dt: float = 0.0) -> None:
-        """Draw game over art, score, and name box.
+        """Draw victory art, score, and name box.
 
         Args:
             score: Final player score.
             dt: Frame delta for the name cursor blink.
         """
         a = self.assets
-        x = (self.screen_w - a.game_over_w) // 2
-        y = (self.screen_h - a.game_over_h) // 2 - 350
-        _ = self.screen.blit(a.game_over, (x, y))
+        x = (self.screen_w - a.victory_w) // 2
+        y = (self.screen_h - a.victory_h) // 2 - 350
+        _ = self.screen.blit(a.victory, (x, y))
 
         label = a.font_medium.render("SCORE", True, (200, 200, 210))
         value = a.font_large.render(str(score), True, self.SCORE_COLOR)

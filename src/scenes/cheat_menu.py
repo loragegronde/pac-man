@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pygame
 
-from src.assets import Assets
-from src.cheats import Cheats
-from src.menu import draw_double_round_rect, point_in
-from src.visual.level_handler import LevelHandler
+from src.utils.assets import Assets
+from src.scenes.cheats import Cheats
+from src.scenes.menu import draw_double_round_rect, point_in
+from src.gameplay.level_handler import LevelHandler
 
 
 class CheatMenu:

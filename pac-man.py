@@ -1,4 +1,4 @@
-from src.parsing import Parsing, Config
+from src.parsing.parsing import Parsing, Config
 import argparse
 from pathlib import Path
 from src.graphics import Graphics

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pygame
 
-from src.assets import Assets
-from src.menu import draw_double_round_rect
+from src.utils.assets import Assets
+from src.scenes.menu import draw_double_round_rect
 
 
 class NameBox:

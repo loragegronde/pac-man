@@ -2,8 +2,8 @@
 
 import pygame
 
-from src.assets import Assets, MenuLayout
-from src.highscores import Highscores, ScoreEntry
+from src.utils.assets import Assets, MenuLayout
+from src.scenes.highscores import Highscores, ScoreEntry
 
 
 def point_in(mx: int, my: int, x: int, y: int, w: int, h: int) -> bool:

@@ -1,7 +1,7 @@
 import pygame
 
-from src.assets import Mob
-from src.visual.maze import Maze
+from src.utils.assets import Mob
+from src.gameplay.maze import Maze
 
 
 class Player:
