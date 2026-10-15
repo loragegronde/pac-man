@@ -13,7 +13,11 @@ def resource_root() -> Path:
     """Project root, or PyInstaller extract dir when frozen."""
     if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
         return Path(sys._MEIPASS)
-    return Path(__file__).resolve().parent.parent
+    here = Path(__file__).resolve().parent
+    for folder in (here, *here.parents):
+        if (folder / "assets").is_dir():
+            return folder
+    return here.parent.parent
 
 
 ASSETS_DIR = resource_root() / "assets"

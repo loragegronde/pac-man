@@ -22,8 +22,7 @@ class Main:
 if __name__ == "__main__":
     try:
         main = Main()
-    except FileExistsError as e:
-        print(e)
+    except Exception:
         sys.exit(1)
     except KeyboardInterrupt:
         sys.exit(1)
